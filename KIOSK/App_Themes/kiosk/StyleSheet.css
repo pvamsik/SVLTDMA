@@ -1,0 +1,13 @@
+﻿#serviceBox {
+    min-height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px);
+    overflow-y: scroll;
+    height: calc(100vh - 200px);
+    box-sizing: border-box;
+}
+#cartBox {
+    max-height: calc(100vh - 390px);
+    overflow-y: scroll;
+    height: calc(100vh - 390px);
+    box-sizing: border-box;
+}

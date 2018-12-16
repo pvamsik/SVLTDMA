@@ -1,0 +1,62 @@
+﻿<%--
+Default skin template. The following skins are provided as examples only.
+
+1. Named control skin. The SkinId should be uniquely defined because
+   duplicate SkinId's per control type are not allowed in the same theme.
+
+<asp:GridView runat="server" SkinId="gridviewSkin" BackColor="White" >
+   <AlternatingRowStyle BackColor="Blue" />
+</asp:GridView>
+
+2. Default skin. The SkinId is not defined. Only one default 
+   control skin per control type is allowed in the same theme.
+
+<asp:Image runat="server" ImageUrl="~/images/image1.jpg" />
+--%>
+
+<asp:Menu runat="server"
+    Orientation="Horizontal" StaticDisplayLevels="2" StaticSubMenuIndent="10px" DynamicHorizontalOffset="2"
+    SkipLinkText="" StaticEnableDefaultPopOutImage="False">
+    <StaticMenuStyle CssClass="menuStyle" />
+    <DynamicHoverStyle BackColor="#990000" ForeColor="White" />
+    <DynamicMenuItemStyle HorizontalPadding="1em" VerticalPadding="0.8em" />
+    <DynamicMenuStyle BackColor="#FFFBD6" />
+    <DynamicSelectedStyle BackColor="#FFCC66" />
+    <StaticHoverStyle BackColor="#990000" ForeColor="White" />
+    <StaticMenuItemStyle HorizontalPadding="1em" VerticalPadding="0.8em" ForeColor="#000000" />
+    <StaticSelectedStyle BackColor="#FFCC66" ForeColor="#990000" />
+</asp:Menu>
+<asp:Label runat="server" SkinId="frmLabel"
+     Width="200" 
+     Font-Bold="True">
+</asp:Label>
+<asp:Label runat="server" SkinId="frmErrorLabel"
+     Font-Bold="True" ForeColor="Red" Font-Size="X-Large">
+</asp:Label>
+<asp:ValidationSummary runat="server" SkinId="frmErrorValidationSummary"
+     Font-Bold="True" ForeColor="Red" Font-Size="X-Large">
+</asp:ValidationSummary>
+<asp:GridView runat="server" ForeColor="#333333" CellPadding="6" GridLines="None" AutoGenerateColumns="False">
+    <AlternatingRowStyle BackColor="White" />
+    <FooterStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <HeaderStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+    <PagerSettings FirstPageText="First" LastPageText="Last" NextPageText="Next" Position="TopAndBottom" PreviousPageText="Previous" />
+    <PagerStyle BackColor="#FFCC66" ForeColor="#333333" HorizontalAlign="Center" />
+    <RowStyle BackColor="#FFFBD6" ForeColor="#333333" />
+    <SelectedRowStyle BackColor="#FFCC66" Font-Bold="True" ForeColor="Navy" />
+    <SortedAscendingCellStyle BackColor="#FDF5AC" />
+    <SortedAscendingHeaderStyle BackColor="#4D0000" />
+    <SortedDescendingCellStyle BackColor="#FCF6C0" />
+    <SortedDescendingHeaderStyle BackColor="#820000" />
+</asp:GridView>
+<asp:ImageButton runat="server" SkinId="settingsButton" Width="100" Height="100" />
+<asp:ValidationSummary  runat="server" ForeColor="Red" Font-Bold="true" />
+<asp:ChangePassword runat="server"  BackColor="#FFFBD6" BorderColor="#FFDFAD" BorderPadding="4" BorderStyle="Solid" BorderWidth="1px" >
+    <CancelButtonStyle BackColor="White" BorderColor="#CC9966" BorderStyle="Solid" BorderWidth="1px" ForeColor="#990000" />
+    <ChangePasswordButtonStyle BackColor="White" BorderColor="#CC9966" BorderStyle="Solid" BorderWidth="1px" ForeColor="#990000" />
+    <ContinueButtonStyle BackColor="White" BorderColor="#CC9966" BorderStyle="Solid" BorderWidth="1px" ForeColor="#990000" />
+    <InstructionTextStyle Font-Italic="True" ForeColor="Black" />
+    <PasswordHintStyle Font-Italic="True" ForeColor="#888888" />
+    <TextBoxStyle />
+    <TitleTextStyle BackColor="#990000" Font-Bold="True" ForeColor="White" />
+</asp:ChangePassword>

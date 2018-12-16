@@ -1,0 +1,15 @@
+﻿<%@ Page Title="Service Request Details" Language="C#" AutoEventWireup="true" MasterPageFile="~/Site.master" CodeFile="serviceRequestDetails.aspx.cs" Inherits="devotee_serviceRequestDetails" %>
+
+<%@ Register Src="~/Controls/ServiceRequestInfo.ascx" TagName="ServiceRequestInfo" TagPrefix="uc1" %>
+<%@ Register Src="~/Controls/serviceInfo.ascx" TagPrefix="uc1" TagName="serviceInfo" %>
+
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link href="../Styles/devoteeInfoStyle.css" rel="stylesheet" />
+    <link href="../Styles/reqForm.css" rel="stylesheet" />
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+     <label ID="lblPrinterMsg" style="color:red;" ></label>
+    <uc1:serviceInfo runat="server" ID="serviceInfo" />
+    <uc1:ServiceRequestInfo runat="server" ID="ServiceRequestInfo" />
+</asp:Content>

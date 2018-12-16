@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="SGModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Service_Type">
+          <Key>
+            <PropertyRef Name="Service_Type_ID" />
+          </Key>
+          <Property Name="Service_Type_ID" Type="int" Nullable="false" />
+          <Property Name="Service_type" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Service_type_description" Type="nvarchar" MaxLength="80" Nullable="false" />
+          <Property Name="Service_type_Eff_Dt" Type="datetime" />
+          <Property Name="Service_type_Exp_Dt" Type="datetime" />
+          <Property Name="ShowDefault" Type="bit" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="SGModelStoreContainer">
+          <EntitySet Name="Service_Type" EntityType="Self.Service_Type" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SGModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Service_Type">
+          <Key>
+            <PropertyRef Name="Service_Type_ID" />
+          </Key>
+          <Property Name="Service_Type_ID" Type="Int32" Nullable="false" />
+          <Property Name="Service_type1" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Service_type_description" Type="String" MaxLength="80" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Service_type_Eff_Dt" Type="DateTime" Precision="3" />
+          <Property Name="Service_type_Exp_Dt" Type="DateTime" Precision="3" />
+          <Property Name="ShowDefault" Type="Boolean" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="ServiceTypeEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Service_Type" EntityType="Self.Service_Type" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SGModelStoreContainer" CdmEntityContainer="ServiceTypeEntities">
+          <EntitySetMapping Name="Service_Type">
+            <EntityTypeMapping TypeName="SGModel.Service_Type">
+              <MappingFragment StoreEntitySet="Service_Type">
+                <ScalarProperty Name="Service_Type_ID" ColumnName="Service_Type_ID" />
+                <ScalarProperty Name="Service_type1" ColumnName="Service_type" />
+                <ScalarProperty Name="Service_type_description" ColumnName="Service_type_description" />
+                <ScalarProperty Name="Service_type_Eff_Dt" ColumnName="Service_type_Eff_Dt" />
+                <ScalarProperty Name="Service_type_Exp_Dt" ColumnName="Service_type_Exp_Dt" />
+                <ScalarProperty Name="ShowDefault" ColumnName="ShowDefault" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

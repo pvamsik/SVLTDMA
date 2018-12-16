@@ -1,0 +1,716 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using StarMicronics.StarIO;
+using System.Configuration;
+using System.Text;
+
+/// <summary>
+/// Summary description for printManager
+/// </summary>
+public class printManager
+{
+    //////////////////////////Developers Note: You may want to use these in your program. 
+    //  These vars are in a global namespace so they can be accessed anywhere in this class.
+    //  Use this to identify if the printer is online or not
+    private Boolean onlineStatus = false;
+    //  This is what we will be using to communicate with the printer through StarIO
+    private IPort sPort;
+    //Print port information
+    public string portName;
+    public string portSettings;
+    //Site Information
+    public string institutionName;
+    private string institutionAddress;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////
+
+    public printManager()
+    {
+        //Set the print settings of the class
+        portName = ConfigurationManager.AppSettings["portName"].ToString();
+        portSettings = ConfigurationManager.AppSettings["portSettings"].ToString();
+        institutionName = ConfigurationManager.AppSettings["institutionName"].ToString();
+        institutionAddress = ConfigurationManager.AppSettings["institutionAddress"].ToString();
+    }
+
+    public Boolean testPrinterStatus()
+    {
+        IPort port = null;
+        Boolean ret = false;
+        try
+        {
+            port = StarMicronics.StarIO.Factory.I.GetPort(portName, portSettings, 10 * 1000);
+            ret = true;
+        }
+        catch (PortException ex)
+        {
+            System.Console.Write(ex.Message);
+            ret = false;
+        }
+        finally
+        {
+            if (port != null)
+            {
+                Factory.I.ReleasePort(port);
+            }
+        }
+        return ret;
+    }
+
+
+    public void printReceipt(DevoteeDTO di, ServiceRequestDTO sr, paymentResponse res, string printRequestType)
+    {
+        if (sr != null)
+        {
+            DateTime dt = new DateTime();
+            dt.Date.ToString();
+            StringBuilder sbReceipt = new StringBuilder();
+            StringBuilder sbCreditCard = new StringBuilder();
+
+            sbReceipt.Append("\x1b\x1d\x61\x1");                                     //Center Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+            sbReceipt.Append("\x1B\x1C\x70\x1\x0");                                  //Stored Logo Printing - Refer to Pg. 3-38 in the linemode_cm_en.pdf
+            sbReceipt.Append(institutionName + "\n");                                // Institution Name 
+            sbReceipt.Append(institutionAddress + "\n\n");                           // Institution Address
+            sbReceipt.Append("\x1b\x1d\x61\x0");                                     //Left Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+            sbReceipt.Append("\x1b\x44\x2\x10\x22\x0");                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+            //sbReceipt.Append("Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n");
+            sbReceipt.Append("Service Date: " + String.Format("{0:dd/MM/yyyy}", Convert.ToDateTime(sr.Service_Date)) + "\n");
+            sbReceipt.Append("Receipt Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n");
+            
+            sbReceipt.Append("Name: " + di.Devotee_First_Name + " " + di.Devotee_Last_Name + "\n");
+            sbReceipt.Append("Payment Mode: " + sr.Payment_type_description + " \n");  // Payment mode
+
+            switch (sr.Payment_Type_id)
+            {
+                case 1:
+                    sbReceipt.Append("Check Number: " + sr.Check_Number + "\n");
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    ServiceRequestTransactionDTO srt = new ServiceRequestTransactionDTO();
+                    if (sr.Transactions.Any())
+                        srt = sr.Transactions.LastOrDefault();
+                    else
+                    {
+                        srt.CardNumber = res.CardNumber;
+                        //srt.TransactionType = res.;
+                    };
+
+                    string expiration = sr.Transactions[0].CardExpiration;
+                    string expMonth = expiration.Substring(2, 2);
+                    string expYear = expiration.Substring(0, 2);
+
+                    sbCreditCard.Append(sbReceipt.ToString());
+                    sbCreditCard.Append("Transaction ID: " + sr.Transactions[0].TransactionID + "\n");
+                    sbCreditCard.Append("CD TYPE: " + sr.Transactions[0].CardType + "\n");
+                    sbCreditCard.Append("TR TYPE: " + sr.Transactions[0].TransactionType + "\n");
+                    sbCreditCard.Append("DATE: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n");
+                    sbCreditCard.Append("\x1b\x44\x2\x10\x22\x0");                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+                    sbCreditCard.Append("------------------------------------------------ \n");
+                    sbCreditCard.Append("\x1b\x45");                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+                    sbCreditCard.Append(sr.Service_Name + "         " + Convert.ToDecimal(sr.Service_Fee_Paid) + "\n");
+                    sbCreditCard.Append("\x1b\x46");                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+                    sbCreditCard.Append("------------------------------------------------ \n");
+                    sbCreditCard.Append("ACCT: " + srt.CardNumber + "\n");
+                    sbCreditCard.Append("EXP DT: " + expMonth + "/" + expYear + "\n");
+                    sbCreditCard.Append("APPROVAL CODE: " + srt.AuthCode + "\n");
+                    sbCreditCard.Append("\x1b\x1d\x61\x1");
+                    sbCreditCard.Append("CARDMEMBER ACKNOWLEDGES RECEIPT OF GOODS AND / \n OR SERVICES IN THE AMOUNT OF THE TOTAL SHOWN \n");
+                    sbCreditCard.Append("HEREON AND AGREES TO PERFORM THE OBLIGATIONS SET FORTH BY THE CARDMEMBER'S AGREEMENT WITH THE \nISSUER. \n");
+                    sbCreditCard.Append("\x1b\x1d\x61\x0");
+                    break;
+                default:
+                    return;
+            }
+            sbReceipt.Append("------------------------------------------------ \n");
+            sbReceipt.Append("\x1b\x45");                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+            sbReceipt.Append(sr.Service_Name + "\x9" + "         " + sr.Service_Fee_Paid + "\n");
+            sbReceipt.Append("\x1b\x46");                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+            sbReceipt.Append("------------------------------------------------ \n");
+            sbReceipt.Append("Thank You for your patronage at SV Lotus Temple");
+            sbReceipt.Append("\x1b\x64\x02"); //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+
+            //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+            //if (ConfigurationManager.AppSettings["prodEnvironment"] == "true")
+            //{
+            switch (printRequestType)
+            {
+                case "TempleCopy":
+                    printToPrinter(sbReceipt.ToString());
+                    break;
+                case "MerchantCopy":
+                    //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+                    //Printing only once to conserver paper in testing environment
+                    //Build Merchant Copy
+                    string merchantCopy = "\n\n" +
+                        "X_______________________________________________ \n" +
+                        "\x1b\x1d\x61\x1" +
+                        "MERCHANT COPY\n" +
+                        "\x1b\x1d\x61\x0" +
+                        "\x1b\x64\x02";                                     //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+
+                    printToPrinter(sbCreditCard.ToString() + merchantCopy);
+                    break;
+
+                case "CustomerCopy":
+                    //Build Customer Copy
+                    string customerCopy = "\n\n" +
+                        "\x1b\x1d\x61\x1" +
+                        "CUSTOMER COPY\n" +
+                        "\x1b\x1d\x61\x0" +
+                        "\x1b\x64\x02";                                         //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+
+                    printToPrinter(sbCreditCard.ToString() + customerCopy);
+                    break;
+                case "PrintReceipt":
+                    printToPrinter(sbReceipt.ToString());
+                    break;
+                default:
+                    break;
+            }
+
+            if (sr.Payment_Type_id == 3)
+            {
+                //printToPrinter(sbReceipt.ToString());
+
+            }
+            else
+            {
+                //printToPrinter(sbReceipt.ToString());
+                //printToPrinter(sbReceipt.ToString());
+            }
+            //}
+            //else
+            //{
+            //    //Printing only once to conserver paper in testing environment
+            //    printToPrinter(sbReceipt.ToString());
+            //}
+
+        }
+    }
+
+    //public void printReceipt(DevoteeDTO di, ServiceRequestDTO sr, paymentResponse res, string printRequestType)
+    //{
+    //    if (sr != null)
+    //    {
+    //        DateTime dt = new DateTime();
+    //        dt.Date.ToString();
+    //        StringBuilder sbReceipt = new StringBuilder();
+    //        StringBuilder sbCreditCard = new StringBuilder();
+
+    //        sbReceipt.Append("\x1b\x1d\x61\x1");                                     //Center Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+    //        sbReceipt.Append("\x1B\x1C\x70\x1\x0");                                  //Stored Logo Printing - Refer to Pg. 3-38 in the linemode_cm_en.pdf
+    //        sbReceipt.Append(institutionName + "\n");                                // Institution Name 
+    //        sbReceipt.Append(institutionAddress + "\n\n");                           // Institution Address
+    //        sbReceipt.Append("\x1b\x1d\x61\x0");                                     //Left Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+    //        sbReceipt.Append("\x1b\x44\x2\x10\x22\x0");                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+    //        sbReceipt.Append("Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n");
+    //        sbReceipt.Append("Name: " + di.Devotee_First_Name + " " + di.Devotee_Last_Name + "\n");
+    //        sbReceipt.Append("Payment Mode: " + sr.Payment_type_description + " \n");  // Payment mode
+
+    //        switch (sr.Payment_Type_id)
+    //        {
+    //            case 1:
+    //                sbReceipt.Append("Check Number: " + sr.Check_Number + "\n");
+    //                break;
+    //            case 2:
+    //                break;
+    //            case 3:
+    //                ServiceRequestTransactionDTO srt = new ServiceRequestTransactionDTO();
+    //                if (sr.Transactions.Any())
+    //                    srt = sr.Transactions.LastOrDefault();
+    //                else
+    //                {
+    //                    srt.CardNumber = res.CardNumber;
+    //                    //srt.TransactionType = res.;
+    //                };
+
+    //                string expiration = sr.Transactions[0].CardExpiration;
+    //                string expMonth = expiration.Substring(2, 2);
+    //                string expYear = expiration.Substring(0, 2);
+
+    //                sbCreditCard.Append(sbReceipt.ToString());
+    //                sbCreditCard.Append("Transaction ID: " + sr.Transactions[0].TransactionID + "\n");
+    //                sbCreditCard.Append("CD TYPE: " + sr.Transactions[0].CardType + "\n");
+    //                sbCreditCard.Append("TR TYPE: " + sr.Transactions[0].TransactionType + "\n");
+    //                sbCreditCard.Append("DATE: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n");
+    //                sbCreditCard.Append("\x1b\x44\x2\x10\x22\x0");                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+    //                sbCreditCard.Append("------------------------------------------------ \n");
+    //                sbCreditCard.Append("\x1b\x45");                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+    //                sbCreditCard.Append(sr.Service_Name + "         " + Convert.ToDecimal(sr.Service_Fee_Paid) + "\n");
+    //                sbCreditCard.Append("\x1b\x46");                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+    //                sbCreditCard.Append("------------------------------------------------ \n");
+    //                sbCreditCard.Append("ACCT: " + srt.CardNumber + "\n");
+    //                sbCreditCard.Append("EXP DT: " + expMonth + "/" + expYear + "\n");
+    //                sbCreditCard.Append("APPROVAL CODE: " + srt.AuthCode + "\n");
+    //                sbCreditCard.Append("\x1b\x1d\x61\x1");
+    //                sbCreditCard.Append("CARDMEMBER ACKNOWLEDGES RECEIPT OF GOODS AND / \n OR SERVICES IN THE AMOUNT OF THE TOTAL SHOWN \n");
+    //                sbCreditCard.Append("HEREON AND AGREES TO PERFORM THE OBLIGATIONS SET FORTH BY THE CARDMEMBER'S AGREEMENT WITH THE \nISSUER. \n");
+    //                sbCreditCard.Append("\x1b\x1d\x61\x0");
+    //                break;
+    //            default:
+    //                return;
+    //        }
+    //        sbReceipt.Append("------------------------------------------------ \n");
+    //        sbReceipt.Append("\x1b\x45");                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+    //        sbReceipt.Append(sr.Service_Name + "\x9" + "         " + sr.Service_Fee_Paid + "\n");
+    //        sbReceipt.Append("\x1b\x46");                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+    //        sbReceipt.Append("------------------------------------------------ \n");
+    //        sbReceipt.Append("Thank You for your patronage at SV Lotus Temple");
+    //        sbReceipt.Append("\x1b\x64\x02"); //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+
+    //        StringBuilder merchantCopy = new StringBuilder();
+    //        StringBuilder customerCopy = new StringBuilder();
+    //        if (sr.Payment_Type_id == 3)
+    //        {
+    //            //Build Merchant Copy
+    //            merchantCopy.Append("\n\n");
+    //            merchantCopy.Append("X_______________________________________________ \n");
+    //            merchantCopy.Append("\x1b\x1d\x61\x1");
+    //            merchantCopy.Append("MERCHANT COPY\n");
+    //            merchantCopy.Append("\x1b\x1d\x61\x0");
+    //            merchantCopy.Append("\x1b\x64\x02");                                 //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+
+    //            //Build Customer Copy
+    //            customerCopy.Append("\n\n");
+    //            customerCopy.Append("\x1b\x1d\x61\x1");
+    //            customerCopy.Append("CUSTOMER COPY\n");
+    //            customerCopy.Append("\x1b\x1d\x61\x0");
+    //            customerCopy.Append("\x1b\x64\x02");                                     //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+    //        }
+                        
+    //        switch (printRequestType)
+    //        {
+    //            case "TempleCopy":
+    //                printToPrinter(sbReceipt.ToString());
+    //                break;
+    //            case "MerchantCopy":
+    //                //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+    //                //Printing only once to conserver paper in testing environment
+
+    //                printToPrinter(sbCreditCard.ToString() + merchantCopy.ToString());
+    //                break;
+    //            case "CustomerCopy":
+    //                printToPrinter(sbCreditCard.ToString() + customerCopy.ToString());
+    //                break;
+    //            case "PrintReceipt":
+    //                if (sr.Payment_Type_id == 3)
+    //                {
+    //                    printToPrinter(sbCreditCard.ToString() + merchantCopy.ToString());
+    //                    printToPrinter(sbCreditCard.ToString() + customerCopy.ToString());
+    //                }
+    //                printToPrinter(sbReceipt.ToString());
+    //                break;
+    //            default:
+    //                break;
+    //        }                        
+    //    }
+    //}
+
+
+    
+    //public void printReceipt(DevoteeDTO di, ServiceRequestDTO sr, paymentResponse res, string printRequestType)
+    //{
+    //    if (sr != null)
+    //    {
+    //        DateTime dt = new DateTime();
+    //        dt.Date.ToString();
+    //        StringBuilder sbReceipt = new StringBuilder();
+    //        StringBuilder sbCreditCard = new StringBuilder();
+
+    //        sbReceipt.Append("\x1b\x1d\x61\x1");                                     //Center Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+    //        sbReceipt.Append("\x1B\x1C\x70\x1\x0");                                  //Stored Logo Printing - Refer to Pg. 3-38 in the linemode_cm_en.pdf
+    //        sbReceipt.Append(institutionName + "\n");                                // Institution Name 
+    //        sbReceipt.Append(institutionAddress + "\n\n");                           // Institution Address
+    //        sbReceipt.Append("\x1b\x1d\x61\x0");                                     //Left Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+    //        sbReceipt.Append("\x1b\x44\x2\x10\x22\x0");                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+    //        sbReceipt.Append("Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n");
+    //        sbReceipt.Append("Name: " + di.Devotee_First_Name + " " + di.Devotee_Last_Name + "\n");
+    //        sbReceipt.Append("Payment Mode: " + sr.Payment_type_description + " \n");  // Payment mode
+
+    //        switch (sr.Payment_Type_id)
+    //        {
+    //            case 1:
+    //                sbReceipt.Append("Check Number: " + sr.Check_Number + "\n");
+    //                break;
+    //            case 2:
+    //                break;
+    //            case 3:
+    //                ServiceRequestTransactionDTO srt = new ServiceRequestTransactionDTO();
+    //                if (sr.Transactions.Any())
+    //                    srt = sr.Transactions.LastOrDefault();
+    //                else
+    //                {
+    //                    srt.CardNumber = res.CardNumber;
+    //                    //srt.TransactionType = res.;
+    //                };
+
+    //                string expiration = sr.Transactions[0].CardExpiration;
+    //                string expMonth = expiration.Substring(2, 2);
+    //                string expYear = expiration.Substring(0, 2);
+
+    //                sbCreditCard.Append(sbReceipt.ToString());
+    //                sbCreditCard.Append("Transaction ID: " + sr.Transactions[0].TransactionID + "\n");
+    //                sbCreditCard.Append("CD TYPE: " + sr.Transactions[0].CardType + "\n");
+    //                sbCreditCard.Append("TR TYPE: " + sr.Transactions[0].TransactionType + "\n");
+    //                sbCreditCard.Append("DATE: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n");
+    //                sbCreditCard.Append("\x1b\x44\x2\x10\x22\x0");                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+    //                sbCreditCard.Append("------------------------------------------------ \n");
+    //                sbCreditCard.Append("\x1b\x45");                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+    //                sbCreditCard.Append(sr.Service_Name + "         " + Convert.ToDecimal(sr.Service_Fee_Paid) + "\n");
+    //                sbCreditCard.Append("\x1b\x46");                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+    //                sbCreditCard.Append("------------------------------------------------ \n");
+    //                sbCreditCard.Append("ACCT: " + srt.CardNumber + "\n");
+    //                sbCreditCard.Append("EXP DT: " + expMonth + "/" + expYear + "\n");
+    //                sbCreditCard.Append("APPROVAL CODE: " + srt.AuthCode + "\n");
+    //                sbCreditCard.Append("\x1b\x1d\x61\x1");
+    //                sbCreditCard.Append("CARDMEMBER ACKNOWLEDGES RECEIPT OF GOODS AND / \n OR SERVICES IN THE AMOUNT OF THE TOTAL SHOWN \n");
+    //                sbCreditCard.Append("HEREON AND AGREES TO PERFORM THE OBLIGATIONS SET FORTH BY THE CARDMEMBER'S AGREEMENT WITH THE \nISSUER. \n");
+    //                sbCreditCard.Append("\x1b\x1d\x61\x0");
+    //                break;
+    //            default:
+    //                return;
+    //        }
+    //        sbReceipt.Append("------------------------------------------------ \n");
+    //        sbReceipt.Append("\x1b\x45");                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+    //        sbReceipt.Append(sr.Service_Name + "\x9" + "         " + sr.Service_Fee_Paid + "\n");
+    //        sbReceipt.Append("\x1b\x46");                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+    //        sbReceipt.Append("------------------------------------------------ \n");
+    //        sbReceipt.Append("Thank You for your patronage at SV Lotus Temple");
+    //        sbReceipt.Append("\x1b\x64\x02"); //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+
+    //        //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+    //        //if (ConfigurationManager.AppSettings["prodEnvironment"] == "true")
+    //        //{
+    //        switch (printRequestType)
+    //        {
+    //            case "TempleCopy":
+    //                printToPrinter(sbReceipt.ToString());
+    //                break;
+    //            case "MerchantCopy":
+    //                //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+    //                //Printing only once to conserver paper in testing environment
+    //                //Build Merchant Copy
+    //                string merchantCopy = "\n\n" +
+    //                    "X_______________________________________________ \n" +
+    //                    "\x1b\x1d\x61\x1" +
+    //                    "MERCHANT COPY\n" +
+    //                    "\x1b\x1d\x61\x0" +
+    //                    "\x1b\x64\x02";                                     //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+
+    //                printToPrinter(sbCreditCard.ToString() + merchantCopy);
+    //                break;
+
+    //            case "CustomerCopy":
+    //                //Build Customer Copy
+    //                string customerCopy = "\n\n" +
+    //                    "\x1b\x1d\x61\x1" +
+    //                    "CUSTOMER COPY\n" +
+    //                    "\x1b\x1d\x61\x0" +
+    //                    "\x1b\x64\x02";                                         //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+
+    //                printToPrinter(sbCreditCard.ToString() + customerCopy);
+    //                break;
+    //            case "PrintReceipt":
+    //                printToPrinter(sbReceipt.ToString());
+    //                break;
+    //            default:
+    //                break;
+    //        } 
+
+    //            if (sr.Payment_Type_id == 3)
+    //            {
+    //                //printToPrinter(sbReceipt.ToString());
+                    
+    //            }
+    //            else
+    //            {
+    //                //printToPrinter(sbReceipt.ToString());
+    //                //printToPrinter(sbReceipt.ToString());
+    //            }
+    //        //}
+    //        //else
+    //        //{
+    //        //    //Printing only once to conserver paper in testing environment
+    //        //    printToPrinter(sbReceipt.ToString());
+    //        //}
+
+    //    }
+    //}
+
+    public void printCashReceipt(string serviceName, string serviceAmount, devoteeInfo di)
+    {
+        DateTime dt = new DateTime();
+        dt.Date.ToString();
+        string receipt = "\x1b\x1d\x61\x1" +                    //Center Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+        "\x1B\x1C\x70\x1\x0" +                                  //Stored Logo Printing - Refer to Pg. 3-38 in the linemode_cm_en.pdf
+        institutionName + "\n" +
+        institutionAddress + "\n\n" +
+        "\x1b\x1d\x61\x0" +                                     //Left Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+        "\x1b\x44\x2\x10\x22\x0" +                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+        "Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n" +
+        "Name: " + di.firstName + " " + di.lastName + "\n" +
+        "Payment Mode: Cash \n" +
+        "------------------------------------------------ \n" +
+        "\x1b\x45" +                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+        serviceName + "\x9" + "         " + serviceAmount + "\n" +
+        "\x1b\x46" +                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+        "------------------------------------------------ \n" +
+        "Thank You for your patronage at SV Lotus Temple" +
+        "\x1b\x64\x02";                                         //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+        //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+        if (ConfigurationManager.AppSettings["prodEnvironment"] == "true")
+        {
+            printToPrinter(receipt);
+            printToPrinter(receipt);
+        }
+        else
+        {
+            printToPrinter(receipt);
+            //printToPrinter(receipt);
+        }
+
+    }
+
+    public void printCheckReceipt(string serviceName, string serviceAmount, devoteeInfo di, string checkNumber)
+    {
+        DateTime dt = new DateTime();
+        dt.Date.ToString();
+        string receipt = "\x1b\x1d\x61\x1" +                    //Center Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+        "\x1B\x1C\x70\x1\x0" +                                  //Stored Logo Printing - Refer to Pg. 3-38 in the linemode_cm_en.pdf
+        institutionName + "\n" +
+        institutionAddress + "\n\n" +
+        "\x1b\x1d\x61\x0" +                                     //Left Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+        "\x1b\x44\x2\x10\x22\x0" +                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+        "Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n" +
+        "Name: " + di.firstName + " " + di.lastName + "\n" +
+        "Payment Mode: Check \n" +
+        "Check Number: " + checkNumber + "\n" +
+        "------------------------------------------------ \n" +
+        "\x1b\x45" +                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+        serviceName + "\x9" + "         " + serviceAmount + "\n" +
+        "\x1b\x46" +                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+        "------------------------------------------------ \n" +
+        "Thank You for your patronage at SV Lotus Temple" +
+        "\x1b\x64\x02";                                         //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+        //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+        if (ConfigurationManager.AppSettings["prodEnvironment"] == "true")
+        {
+            printToPrinter(receipt);
+            printToPrinter(receipt);
+        }
+        else
+        {
+            //Printing only once to conserver paper in testing environment
+            printToPrinter(receipt);
+        }
+    }
+
+    public void printCCReceipt(string serviceName, string serviceAmount, paymentResponse res, string cardType, string trType, string expMonth, string expYear, devoteeInfo di)
+    {
+        DateTime dt = new DateTime();
+        dt.Date.ToString();
+        string receipt = "\x1b\x1d\x61\x1" +                    //Center Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+        "\x1B\x1C\x70\x1\x0" +                                  //Stored Logo Printing - Refer to Pg. 3-38 in the linemode_cm_en.pdf
+        institutionName + "\n" +
+        institutionAddress + "\n\n" +
+        "\x1b\x1d\x61\x0" +                                     //Left Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+        "Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n" +
+        "Name: " + di.firstName + " " + di.lastName + "\n" +
+        "Payment Mode: Credit Card \n\n" +
+        "Transaction ID: " + res.TransactionID + "\n" +
+        "CD TYPE: " + cardType + "\n" +
+        "TR TYPE: " + trType + "\n" +
+        "DATE: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n" +
+        "\x1b\x44\x2\x10\x22\x0" +                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+        "------------------------------------------------ \n" +
+        "\x1b\x45" +                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+        serviceName + "         " + serviceAmount + "\n" +
+        "\x1b\x46" +                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+        "------------------------------------------------ \n" +
+        "ACCT: " + res.CardNumber + "\n" +
+        "EXP DT: " + expMonth + "/" + expYear + "\n" +
+        "APPROVAL CODE: " + res.AuthCode + "\n" +
+        "\x1b\x1d\x61\x1" +
+        "CARDMEMBER ACKNOWLEDGES RECEIPT OF GOODS AND / \n OR SERVICES IN THE AMOUNT OF THE TOTAL SHOWN \n" +
+        "HEREON AND AGREES TO PERFORM THE OBLIGATIONS SET FORTH BY THE CARDMEMBER'S AGREEMENT WITH THE \nISSUER. \n" +
+        "\x1b\x1d\x61\x0";
+
+
+        //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+        //Printing only once to conserver paper in testing environment
+        //Build Merchant Copy
+        string merchantCopy = receipt;
+        merchantCopy = merchantCopy +
+            "\n\n" +
+            "X_______________________________________________ \n" +
+            "\x1b\x1d\x61\x1" +
+            "MERCHANT COPY\n" + 
+            "\x1b\x1d\x61\x0" +
+            "\x1b\x64\x02";                                     //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+        printToPrinter(merchantCopy);
+
+        //Build Customer Copy
+        string customerCopy = receipt;
+        customerCopy = customerCopy +
+            "\n\n" +
+            "\x1b\x1d\x61\x1" +
+            "CUSTOMER COPY\n" +
+            "\x1b\x1d\x61\x0" +
+            "\x1b\x64\x02";                                         //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+        printToPrinter(customerCopy);
+
+        //Print Temple Receipt
+        string templeCopy;
+        templeCopy = "\x1b\x1d\x61\x1" +                    //Center Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+            "\x1B\x1C\x70\x1\x0" +                                  //Stored Logo Printing - Refer to Pg. 3-38 in the linemode_cm_en.pdf
+            institutionName + "\n" +
+            institutionAddress + "\n\n" +
+            "\x1b\x1d\x61\x0" +                                     //Left Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+            "\x1b\x44\x2\x10\x22\x0" +                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+            "Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n" +
+            "Name: " + di.firstName + " " + di.lastName + "\n" +
+            "Payment Mode: Credit Card \n" +
+            "------------------------------------------------ \n" +
+            "\x1b\x45" +                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+            serviceName + "\x9" + "         " + serviceAmount + "\n" +
+            "\x1b\x46" +                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+            "------------------------------------------------ \n" +
+            "Thank You for your patronage at SV Lotus Temple" +
+            "\x1b\x64\x02";
+        printToPrinter(templeCopy);
+
+    }
+
+    public void printReceipt(string serviceName, string serviceAmount)
+    {
+        DateTime dt = new DateTime();
+        dt.Date.ToString();
+        string receipt = "\x1b\x1d\x61\x1" +                    //Center Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+        "\x1B\x1C\x70\x1\x0" +                                  //Stored Logo Printing - Refer to Pg. 3-38 in the linemode_cm_en.pdf
+        institutionName + "\n" +
+        institutionAddress + "\n\n" +
+        "\x1b\x1d\x61\x0" +                                     //Left Alignment - Refer to Pg. 3-29 in the linemode_cm_en.pdf
+        "\x1b\x44\x2\x10\x22\x0" +                              //Setting Horizontal Tab - Pg. 3-27 in the linemode_cm_en.pdf
+        "Date: " + DateTime.Now.ToString("MM/dd/yyyy hh:mm") + "\n" +
+        "------------------------------------------------ \n" +
+        "\x1b\x45" +                                            //Select Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+        serviceName + "\x9" + "         " + serviceAmount + "\n" +
+        "\x1b\x46" +                                            //Cancel Emphasized Printing - Pg. 3-14 in the linemode_cm_en.pdf
+        "------------------------------------------------ \n" +
+        "Thank You for your patronage at SV Lotus Temple" +
+        "\x1b\x64\x02";                                         //Cut  - Pg. 3-41 in the linemode_cm_en.pdf
+        //Send the sample receipt for printing, goto the function printToPrinter for examples on how the print job is sent.
+        printToPrinter(receipt);
+        printToPrinter(receipt);
+    }
+
+    public void printTestMessage(string prnData)
+    {
+        string receipt = "\x1b\x1d\x61\x1" +
+            prnData +
+            "\n\n\n" +
+            "\x1b\x64\x02";
+        printToPrinter(receipt);
+    }
+
+    private void printToPrinter(string prnData)
+    {
+        //Set the status to offline because this is a new attempt to print
+        onlineStatus = false;
+
+        //TRY -> Use the textboxes to check if the port info given will connect to the printer.
+        try
+        {
+            //Very important to only try opening the port in a Try, Catch incase the port is not working
+            this.sPort = Factory.I.GetPort(portName, portSettings, 10000);
+
+            //GetOnlineStatus() will return a boolean to let us know if the printer was reachable.
+            this.onlineStatus = sPort.GetOnlineStatus();
+        }
+
+        //CATCH -> If the port information is bad, catch the failure.
+        catch (PortException)
+        {
+            if (this.sPort != null)
+                Factory.I.ReleasePort(this.sPort);
+
+            //lblPrinterStatus.Text = "Port Error";
+            //lblPrinterStatus.ForeColor = Color.Red;
+            return; //exit this entire function
+        }
+
+        //If it is offline, dont setup receipt or try to write to the port.
+        if (onlineStatus == false)
+        {
+            //lblPrinterStatus.Text = "Offline";
+            //lblPrinterStatus.ForeColor = Color.Red;
+            Factory.I.ReleasePort(sPort);
+        }
+        //Else statement means it is ONLINE, lets start the printjob
+        else
+        {
+            //lblPrinterStatus.Text = "Online";
+            //lblPrinterStatus.ForeColor = Color.Green;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+            //     Encoding your string to a byte array and how code pages effect string/char encoding.
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+            // You can use the following command to convert your string to a byte array but notice how we can specify a code page.
+            // Here is way to set CODE PAGE 852 to match with the printer CODE PAGE 852
+            //  
+            //     Encoding ec = Encoding.GetEncoding(852); 
+            //     byte[] command = ec.GetBytes(prnData);
+            //
+            // If your software will be using a different code page, this is how you can encode the string correctly to get the desired text to byte encoding.
+            //
+            // In this example we will be using UTF8 to encode our string to a byte array but you can use ASCII for legacy systems like this.
+            //
+            //     byte[] command = ASCIIEncoding.ASCII.GetBytes(print);
+            //
+            // Using System.Text.Encoding, we can call Encoding.UTF8.GetBytes(string); to convert our string hex data to a byte array. (Recommended)
+            byte[] dataByteArray = Encoding.UTF8.GetBytes(prnData);
+
+            //Write bytes to printer
+            uint amountWritten = 0;
+            uint amountWrittenKeep;
+            while (dataByteArray.Length > amountWritten)
+            {
+                //This while loop is very important because in here is where the bytes are being sent out through StarIO to the printer
+                amountWrittenKeep = amountWritten;
+                try
+                {
+                    amountWritten += sPort.WritePort(dataByteArray, amountWritten, (uint)dataByteArray.Length - amountWritten);
+                }
+                catch (PortException)
+                {
+                    // error happen while sending data
+                    //this.lblPrinterStatus.Text = "Port Error";
+                    //this.lblPrinterStatus.ForeColor = Color.Red;
+                    Factory.I.ReleasePort(sPort);
+                    return;
+                }
+
+                if (amountWrittenKeep == amountWritten) // no data is sent
+                {
+                    Factory.I.ReleasePort(sPort);
+                    //lblPrinterStatus.Text = "Can't send data";
+                    //this.lblPrinterStatus.ForeColor = Color.Red;
+                    return; //exit this entire function
+                }
+            }
+
+            //Release the port 
+            //THIS IS VERY IMPORTANT, IF YOU OPEN THE PORT AND DO NOT CLOSE IT, YOU WILL HAVE PROBLEMS
+            Factory.I.ReleasePort(sPort);
+            //////////////////////////
+
+            //Send the data to the log, you can take this out of the code in your application
+            //appendLog(dataByteArray);
+        }
+    }
+}

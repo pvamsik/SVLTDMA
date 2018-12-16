@@ -1,0 +1,426 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="oldOrderModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="OrderItems">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="orderItemGuid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="OrderId" Type="int" Nullable="false" />
+          <Property Name="serviceId" Type="int" Nullable="false" />
+          <Property Name="serviceDate" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="serviceName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="quantity" Type="int" Nullable="false" />
+          <Property Name="price" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="comments" Type="varchar(max)" />
+          <Property Name="itemStatus" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Orders">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="devoteeID" Type="int" Nullable="false" />
+          <Property Name="MailAddressId" Type="int" Nullable="false" />
+          <Property Name="orderDate" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="orderGuid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="orderItemCount" Type="smallint" Nullable="false" />
+          <Property Name="orderStatus" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="orderTotal" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="orderCreatedBy" Type="nvarchar(max)" />
+          <Property Name="paymentStatus" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="paymentMethodName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="refundedAmount" Type="decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="checkDate" Type="datetime" />
+          <Property Name="checkNumber" Type="nvarchar(max)" />
+          <Property Name="checkDepositDate" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="checkDepositregisteredBy" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="checkRoutingNumber" Type="nvarchar(max)" />
+          <Property Name="checkAccountNumber" Type="nvarchar(max)" />
+          <Property Name="cardType" Type="nvarchar(max)" />
+          <Property Name="cardName" Type="nvarchar(max)" />
+          <Property Name="cardNumberMasked" Type="nvarchar(max)" />
+          <Property Name="cardCVV2" Type="nvarchar(max)" />
+          <Property Name="cardExpirationMonth" Type="nvarchar(max)" />
+          <Property Name="cardExpirationYear" Type="nvarchar(max)" />
+          <Property Name="authorizationTransactionId" Type="nvarchar(max)" />
+          <Property Name="authorizationTransactionCode" Type="nvarchar(max)" />
+          <Property Name="comment1" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="comment2" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="comment3" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="refundTransactionId" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="refundTransactionCode" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Service_Requests">
+          <Key>
+            <PropertyRef Name="Service_Request_ID" />
+          </Key>
+          <Property Name="Service_Request_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Devotee_ID" Type="int" />
+          <Property Name="Service_ID" Type="int" Nullable="false" />
+          <Property Name="Service_Date" Type="datetime" Nullable="false" />
+          <Property Name="Priest_ID" Type="int" />
+          <Property Name="Payment_Type_ID" Type="int" />
+          <Property Name="Check_Number" Type="int" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="100" />
+          <Property Name="Created_Date" Type="datetime" />
+          <Property Name="ModifiedBy" Type="nvarchar" MaxLength="100" />
+          <Property Name="Modified_Date" Type="datetime" />
+          <Property Name="Devotee_ID_Original" Type="int" />
+          <Property Name="Status" Type="nchar" MaxLength="15" />
+          <Property Name="Service_Fee_Paid" Type="numeric" Precision="10" Scale="2" />
+          <Property Name="Check_Deposit_Date" Type="datetime" />
+          <Property Name="Check_Deposit_Registered_By" Type="nvarchar" MaxLength="100" />
+          <Property Name="Comment1" Type="nvarchar" MaxLength="255" />
+          <Property Name="Comment2" Type="nvarchar" MaxLength="255" />
+          <Property Name="Comment3" Type="nvarchar" MaxLength="255" />
+          <Property Name="Check_Date" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Service_Requests_Transaction">
+          <Key>
+            <PropertyRef Name="Service_Req_Tran_ID" />
+          </Key>
+          <Property Name="Service_Req_Tran_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Service_Request_ID" Type="int" Nullable="false" />
+          <Property Name="TransactionID" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="TransactionType" Type="varchar" MaxLength="20" />
+          <Property Name="Credit_Card_Type" Type="varchar" MaxLength="20" />
+          <Property Name="CardNumber" Type="varchar" MaxLength="20" />
+          <Property Name="CardExpiration" Type="varchar" MaxLength="4" />
+          <Property Name="RequestedAmount" Type="float" />
+          <Property Name="ApprovedAmount" Type="float" />
+          <Property Name="AuthCode" Type="varchar" MaxLength="20" />
+          <Property Name="AVSResponse" Type="varchar" MaxLength="20" />
+          <Property Name="CardCodeResponse" Type="varchar" MaxLength="20" />
+          <Property Name="IsApproved" Type="bit" Nullable="false" />
+          <Property Name="TransactionMessage" Type="varchar" MaxLength="255" />
+          <Property Name="ResponseCode" Type="varchar" MaxLength="20" />
+          <Property Name="CreatedBy" Type="nvarchar" MaxLength="100" />
+          <Property Name="Created_Date" Type="datetime" />
+          <Property Name="ModifiedBy" Type="nvarchar" MaxLength="100" />
+          <Property Name="Modified_Date" Type="datetime" />
+        </EntityType>
+        <Association Name="FK__Service_R__Servi__27F8EE98">
+          <End Role="Service_Requests" Type="Self.Service_Requests" Multiplicity="1" />
+          <End Role="Service_Requests_Transaction" Type="Self.Service_Requests_Transaction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service_Requests">
+              <PropertyRef Name="Service_Request_ID" />
+            </Principal>
+            <Dependent Role="Service_Requests_Transaction">
+              <PropertyRef Name="Service_Request_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Order_OrderItem">
+          <End Role="Orders" Type="Self.Orders" Multiplicity="1" />
+          <End Role="OrderItems" Type="Self.OrderItems" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Orders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="OrderItems">
+              <PropertyRef Name="OrderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="oldOrderModelStoreContainer">
+          <EntitySet Name="OrderItems" EntityType="Self.OrderItems" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Orders" EntityType="Self.Orders" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Service_Requests" EntityType="Self.Service_Requests" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Service_Requests_Transaction" EntityType="Self.Service_Requests_Transaction" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Service_R__Servi__27F8EE98" Association="Self.FK__Service_R__Servi__27F8EE98">
+            <End Role="Service_Requests" EntitySet="Service_Requests" />
+            <End Role="Service_Requests_Transaction" EntitySet="Service_Requests_Transaction" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Order_OrderItem" Association="Self.FK_Order_OrderItem">
+            <End Role="Orders" EntitySet="Orders" />
+            <End Role="OrderItems" EntitySet="OrderItems" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DMAModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="OrderItem">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="orderItemGuid" Type="Guid" Nullable="false" />
+          <Property Name="OrderId" Type="Int32" Nullable="false" />
+          <Property Name="serviceId" Type="Int32" Nullable="false" />
+          <Property Name="serviceDate" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="serviceName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="quantity" Type="Int32" Nullable="false" />
+          <Property Name="price" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="itemStatus" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Order" Relationship="Self.FK_Order_OrderItem" FromRole="OrderItems" ToRole="Orders" />
+        </EntityType>
+        <EntityType Name="Order">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="devoteeID" Type="Int32" Nullable="false" />
+          <Property Name="MailAddressId" Type="Int32" Nullable="false" />
+          <Property Name="orderDate" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="orderGuid" Type="Guid" Nullable="false" />
+          <Property Name="orderItemCount" Type="Int16" Nullable="false" />
+          <Property Name="orderStatus" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="orderTotal" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="orderCreatedBy" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="paymentStatus" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="paymentMethodName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="refundedAmount" Type="Decimal" Precision="18" Scale="4" Nullable="false" />
+          <Property Name="checkDate" Type="DateTime" Precision="3" />
+          <Property Name="checkNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="checkDepositDate" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="checkDepositregisteredBy" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="checkRoutingNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="checkAccountNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="cardType" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="cardName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="cardNumberMasked" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="cardCVV2" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="cardExpirationMonth" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="cardExpirationYear" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="authorizationTransactionId" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="authorizationTransactionCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="comment1" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="comment2" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="comment3" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="refundTransactionId" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="refundTransactionCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="OrderItems" Relationship="Self.FK_Order_OrderItem" FromRole="Orders" ToRole="OrderItems" />
+        </EntityType>
+        <EntityType Name="Service_Requests">
+          <Key>
+            <PropertyRef Name="Service_Request_ID" />
+          </Key>
+          <Property Name="Service_Request_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Devotee_ID" Type="Int32" />
+          <Property Name="Service_ID" Type="Int32" Nullable="false" />
+          <Property Name="Service_Date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Priest_ID" Type="Int32" />
+          <Property Name="Payment_Type_ID" Type="Int32" />
+          <Property Name="Check_Number" Type="Int32" />
+          <Property Name="CreatedBy" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Created_Date" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Modified_Date" Type="DateTime" Precision="3" />
+          <Property Name="Devotee_ID_Original" Type="Int32" />
+          <Property Name="Status" Type="String" MaxLength="15" FixedLength="true" Unicode="true" />
+          <Property Name="Service_Fee_Paid" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="Check_Deposit_Date" Type="DateTime" Precision="3" />
+          <Property Name="Check_Deposit_Registered_By" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Comment1" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Comment2" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Comment3" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Check_Date" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Service_Requests_Transaction" Relationship="Self.FK__Service_R__Servi__27F8EE98" FromRole="Service_Requests" ToRole="Service_Requests_Transaction" />
+        </EntityType>
+        <EntityType Name="Service_Requests_Transaction">
+          <Key>
+            <PropertyRef Name="Service_Req_Tran_ID" />
+          </Key>
+          <Property Name="Service_Req_Tran_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Service_Request_ID" Type="Int32" Nullable="false" />
+          <Property Name="TransactionID" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TransactionType" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Credit_Card_Type" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CardNumber" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CardExpiration" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+          <Property Name="RequestedAmount" Type="Double" />
+          <Property Name="ApprovedAmount" Type="Double" />
+          <Property Name="AuthCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="AVSResponse" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CardCodeResponse" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="IsApproved" Type="Boolean" Nullable="false" />
+          <Property Name="TransactionMessage" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="ResponseCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Created_Date" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Modified_Date" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Service_Requests" Relationship="Self.FK__Service_R__Servi__27F8EE98" FromRole="Service_Requests_Transaction" ToRole="Service_Requests" />
+        </EntityType>
+        <Association Name="FK_Order_OrderItem">
+          <End Role="Orders" Type="Self.Order" Multiplicity="1" />
+          <End Role="OrderItems" Type="Self.OrderItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Orders">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="OrderItems">
+              <PropertyRef Name="OrderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Service_R__Servi__27F8EE98">
+          <End Role="Service_Requests" Type="Self.Service_Requests" Multiplicity="1" />
+          <End Role="Service_Requests_Transaction" Type="Self.Service_Requests_Transaction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Service_Requests">
+              <PropertyRef Name="Service_Request_ID" />
+            </Principal>
+            <Dependent Role="Service_Requests_Transaction">
+              <PropertyRef Name="Service_Request_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="oldOrderEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="OrderItems" EntityType="Self.OrderItem" />
+          <EntitySet Name="Orders" EntityType="Self.Order" />
+          <EntitySet Name="Service_Requests" EntityType="Self.Service_Requests" />
+          <EntitySet Name="Service_Requests_Transaction" EntityType="Self.Service_Requests_Transaction" />
+          <AssociationSet Name="FK_Order_OrderItem" Association="Self.FK_Order_OrderItem">
+            <End Role="Orders" EntitySet="Orders" />
+            <End Role="OrderItems" EntitySet="OrderItems" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Service_R__Servi__27F8EE98" Association="Self.FK__Service_R__Servi__27F8EE98">
+            <End Role="Service_Requests" EntitySet="Service_Requests" />
+            <End Role="Service_Requests_Transaction" EntitySet="Service_Requests_Transaction" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="oldOrderModelStoreContainer" CdmEntityContainer="oldOrderEntities">
+          <EntitySetMapping Name="OrderItems">
+            <EntityTypeMapping TypeName="DMAModel.OrderItem">
+              <MappingFragment StoreEntitySet="OrderItems">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="orderItemGuid" ColumnName="orderItemGuid" />
+                <ScalarProperty Name="OrderId" ColumnName="OrderId" />
+                <ScalarProperty Name="serviceId" ColumnName="serviceId" />
+                <ScalarProperty Name="serviceDate" ColumnName="serviceDate" />
+                <ScalarProperty Name="serviceName" ColumnName="serviceName" />
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="price" ColumnName="price" />
+                <ScalarProperty Name="comments" ColumnName="comments" />
+                <ScalarProperty Name="itemStatus" ColumnName="itemStatus" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Orders">
+            <EntityTypeMapping TypeName="DMAModel.Order">
+              <MappingFragment StoreEntitySet="Orders">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="devoteeID" ColumnName="devoteeID" />
+                <ScalarProperty Name="MailAddressId" ColumnName="MailAddressId" />
+                <ScalarProperty Name="orderDate" ColumnName="orderDate" />
+                <ScalarProperty Name="orderGuid" ColumnName="orderGuid" />
+                <ScalarProperty Name="orderItemCount" ColumnName="orderItemCount" />
+                <ScalarProperty Name="orderStatus" ColumnName="orderStatus" />
+                <ScalarProperty Name="orderTotal" ColumnName="orderTotal" />
+                <ScalarProperty Name="orderCreatedBy" ColumnName="orderCreatedBy" />
+                <ScalarProperty Name="paymentStatus" ColumnName="paymentStatus" />
+                <ScalarProperty Name="paymentMethodName" ColumnName="paymentMethodName" />
+                <ScalarProperty Name="refundedAmount" ColumnName="refundedAmount" />
+                <ScalarProperty Name="checkDate" ColumnName="checkDate" />
+                <ScalarProperty Name="checkNumber" ColumnName="checkNumber" />
+                <ScalarProperty Name="checkDepositDate" ColumnName="checkDepositDate" />
+                <ScalarProperty Name="checkDepositregisteredBy" ColumnName="checkDepositregisteredBy" />
+                <ScalarProperty Name="checkRoutingNumber" ColumnName="checkRoutingNumber" />
+                <ScalarProperty Name="checkAccountNumber" ColumnName="checkAccountNumber" />
+                <ScalarProperty Name="cardType" ColumnName="cardType" />
+                <ScalarProperty Name="cardName" ColumnName="cardName" />
+                <ScalarProperty Name="cardNumberMasked" ColumnName="cardNumberMasked" />
+                <ScalarProperty Name="cardCVV2" ColumnName="cardCVV2" />
+                <ScalarProperty Name="cardExpirationMonth" ColumnName="cardExpirationMonth" />
+                <ScalarProperty Name="cardExpirationYear" ColumnName="cardExpirationYear" />
+                <ScalarProperty Name="authorizationTransactionId" ColumnName="authorizationTransactionId" />
+                <ScalarProperty Name="authorizationTransactionCode" ColumnName="authorizationTransactionCode" />
+                <ScalarProperty Name="comment1" ColumnName="comment1" />
+                <ScalarProperty Name="comment2" ColumnName="comment2" />
+                <ScalarProperty Name="comment3" ColumnName="comment3" />
+                <ScalarProperty Name="refundTransactionId" ColumnName="refundTransactionId" />
+                <ScalarProperty Name="refundTransactionCode" ColumnName="refundTransactionCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Service_Requests">
+            <EntityTypeMapping TypeName="DMAModel.Service_Requests">
+              <MappingFragment StoreEntitySet="Service_Requests">
+                <ScalarProperty Name="Service_Request_ID" ColumnName="Service_Request_ID" />
+                <ScalarProperty Name="Devotee_ID" ColumnName="Devotee_ID" />
+                <ScalarProperty Name="Service_ID" ColumnName="Service_ID" />
+                <ScalarProperty Name="Service_Date" ColumnName="Service_Date" />
+                <ScalarProperty Name="Priest_ID" ColumnName="Priest_ID" />
+                <ScalarProperty Name="Payment_Type_ID" ColumnName="Payment_Type_ID" />
+                <ScalarProperty Name="Check_Number" ColumnName="Check_Number" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="Created_Date" ColumnName="Created_Date" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="Modified_Date" ColumnName="Modified_Date" />
+                <ScalarProperty Name="Devotee_ID_Original" ColumnName="Devotee_ID_Original" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Service_Fee_Paid" ColumnName="Service_Fee_Paid" />
+                <ScalarProperty Name="Check_Deposit_Date" ColumnName="Check_Deposit_Date" />
+                <ScalarProperty Name="Check_Deposit_Registered_By" ColumnName="Check_Deposit_Registered_By" />
+                <ScalarProperty Name="Comment1" ColumnName="Comment1" />
+                <ScalarProperty Name="Comment2" ColumnName="Comment2" />
+                <ScalarProperty Name="Comment3" ColumnName="Comment3" />
+                <ScalarProperty Name="Check_Date" ColumnName="Check_Date" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Service_Requests_Transaction">
+            <EntityTypeMapping TypeName="DMAModel.Service_Requests_Transaction">
+              <MappingFragment StoreEntitySet="Service_Requests_Transaction">
+                <ScalarProperty Name="Service_Req_Tran_ID" ColumnName="Service_Req_Tran_ID" />
+                <ScalarProperty Name="Service_Request_ID" ColumnName="Service_Request_ID" />
+                <ScalarProperty Name="TransactionID" ColumnName="TransactionID" />
+                <ScalarProperty Name="TransactionType" ColumnName="TransactionType" />
+                <ScalarProperty Name="Credit_Card_Type" ColumnName="Credit_Card_Type" />
+                <ScalarProperty Name="CardNumber" ColumnName="CardNumber" />
+                <ScalarProperty Name="CardExpiration" ColumnName="CardExpiration" />
+                <ScalarProperty Name="RequestedAmount" ColumnName="RequestedAmount" />
+                <ScalarProperty Name="ApprovedAmount" ColumnName="ApprovedAmount" />
+                <ScalarProperty Name="AuthCode" ColumnName="AuthCode" />
+                <ScalarProperty Name="AVSResponse" ColumnName="AVSResponse" />
+                <ScalarProperty Name="CardCodeResponse" ColumnName="CardCodeResponse" />
+                <ScalarProperty Name="IsApproved" ColumnName="IsApproved" />
+                <ScalarProperty Name="TransactionMessage" ColumnName="TransactionMessage" />
+                <ScalarProperty Name="ResponseCode" ColumnName="ResponseCode" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="Created_Date" ColumnName="Created_Date" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="Modified_Date" ColumnName="Modified_Date" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

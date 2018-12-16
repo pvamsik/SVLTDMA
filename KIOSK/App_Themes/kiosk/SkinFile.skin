@@ -1,0 +1,31 @@
+﻿<%--
+Default skin template. The following skins are provided as examples only.
+
+1. Named control skin. The SkinId should be uniquely defined because
+   duplicate SkinId's per control type are not allowed in the same theme.
+
+<asp:GridView runat="server" SkinId="gridviewSkin" BackColor="White" >
+   <AlternatingRowStyle BackColor="Blue" />
+</asp:GridView>
+
+2. Default skin. The SkinId is not defined. Only one default 
+   control skin per control type is allowed in the same theme.
+
+<asp:Image runat="server" ImageUrl="~/images/image1.jpg" />
+--%>
+
+<asp:Label runat="server" SkinId="frmLabel" CssClass="control-label col-lg-3"></asp:Label>
+<asp:Label runat="server" SkinId="frmErrorLabel"
+     Font-Bold="True" ForeColor="Red" Font-Size="X-Large">
+</asp:Label>
+<asp:TextBox runat="server" CssClass="form-control"></asp:TextBox>
+<asp:ValidationSummary runat="server" SkinId="frmErrorValidationSummary"
+     Font-Bold="True" ForeColor="Red" Font-Size="X-Large">
+</asp:ValidationSummary>
+<asp:GridView runat="server" CssClass="table table-striped table-hover" CellPadding="6" GridLines="None" AutoGenerateColumns="False" PageSize="10">
+    <PagerStyle HorizontalAlign="Center" CssClass="GridPager" />
+    <PagerSettings PageButtonCount="25" />
+</asp:GridView>
+<asp:ImageButton runat="server" SkinId="settingsButton" Width="100" Height="100" />
+<asp:ValidationSummary  runat="server" ForeColor="Red" Font-Bold="true" />
+<asp:Panel runat="server" CssClass="panel panel-primary" />

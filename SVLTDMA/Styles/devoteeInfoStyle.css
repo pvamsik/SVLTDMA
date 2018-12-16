@@ -1,0 +1,78 @@
+﻿.frmDevoteeDetail
+{
+    margin: 0 0 20px 0;
+    padding: 0 5px;
+    width: 300px;
+}
+
+.frmDevoteeDetailLeft
+{
+    width: 75px;
+    float: left;
+}
+
+.frmDevoteeDetailRight
+{
+    float: left;
+}
+
+.style1
+{
+    height: 47px;
+}
+
+.clear
+{
+    clear: both;
+}
+
+.service-info {
+    
+}
+    .service-info ul {
+     padding:0px;
+     margin:0px;
+    }
+    .service-info li {
+        list-style: none none;
+        margin:10px 0px; 
+               
+    }
+        .service-info li .lbl-normal{
+
+        }
+        .service-info li .lbl-bold{
+
+        }
+.service-info-left {
+    
+    float:left;
+}
+
+.service-info-right {
+    
+    float:left;
+}
+
+.service-info-left,
+.service-info-right {
+    width:45%;
+}
+    #service-info-left li,
+    #service-info-right li {
+        list-style:none none;
+    }
+
+.service-transactions {
+    clear:both;
+}
+
+
+.lbl-normal {
+        padding-right: 10px;
+}
+.lbl-bold {
+    font-weight:bold;
+    padding-right: 20px;
+}
+        

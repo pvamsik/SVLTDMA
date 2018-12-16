@@ -1,0 +1,173 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+/// <summary>
+/// Summary description for getLastName
+/// </summary>
+[System.Web.Script.Services.ScriptService]
+public class myServices : System.Web.Services.WebService {
+
+    public myServices()
+    {
+    }
+
+    [WebMethod]
+    public List<string> getLastNames(string prefixText, int count, string contextKey)
+    {
+
+        Data data = new Data();
+
+        List<NameValueDTO> d = data.GetDevoteeLastName(prefixText);
+        List<string> Names = new List<string>();
+        
+        d.ForEach(delegate(NameValueDTO dto)
+        {
+            Names.Add(dto.Name);
+        });
+
+        return Names;
+        
+
+        //List<string> Names = new List<string>();
+
+        //DataTable dt = new DataTable();
+        //string constr = ConfigurationManager.ConnectionStrings["ApplicationServices"].ToString();
+        //SqlConnection con = new SqlConnection(constr);
+        //con.Open();
+        //SqlCommand cmd = new SqlCommand("SELECT [Devotee_Last_Name] FROM [Devotee] WHERE [Devotee_Last_Name] LIKE @lname+'%'", con);
+        //cmd.Parameters.AddWithValue("@lname", prefixText);
+        //SqlDataAdapter adp = new SqlDataAdapter(cmd);
+        //adp.Fill(dt);
+
+        //for (int i = 0; i < dt.Rows.Count; i++)
+        //{
+        //    //Names.Add(dt.Rows[i][0].ToString());
+        //}
+        //return (from m in Names
+        //        where m.StartsWith(prefixText, StringComparison.CurrentCultureIgnoreCase)
+        //        select m).Take(count).ToList();
+    }
+
+    [WebMethod]
+    public List<string> getFirstNames(string prefixText, int count, string contextKey)
+    {
+
+        Data data = new Data();
+
+        List<NameValueDTO> d = data.GetDevoteeFirstName(prefixText);
+        List<string> Names = new List<string>();
+
+        d.ForEach(delegate(NameValueDTO dto)
+        {
+            Names.Add(dto.Name);
+        });
+
+        return Names;
+        //List<string> Names = new List<string>();
+
+        //DataTable dt = new DataTable();
+        //string constr = ConfigurationManager.ConnectionStrings["ApplicationServices"].ToString();
+        //SqlConnection con = new SqlConnection(constr);
+        //con.Open();
+
+        //SqlCommand cmd = new SqlCommand();
+        //cmd.Connection = con;
+        //switch (contextKey)
+        //{
+        //    case "FName":
+        //        cmd.CommandText = "SELECT [Devotee_First_Name] FROM [Devotee] WHERE [Devotee_First_Name] LIKE @fname+'%'";
+        //        cmd.Parameters.AddWithValue("@fname", prefixText);
+        //        break;
+        //    case "LName":
+        //        cmd.CommandText = "SELECT [Devotee_Last_Name] FROM [Devotee] WHERE [Devotee_Last_Name] LIKE @lname+'%'";
+        //        cmd.Parameters.AddWithValue("@lname", prefixText);
+        //        break;
+        //    default:
+        //        break;
+        //}
+
+        //SqlDataAdapter adp = new SqlDataAdapter(cmd);
+        //try
+        //{
+        //    adp.Fill(dt);
+        //    for (int i = 0; i < dt.Rows.Count; i++)
+        //    {
+        //        Names.Add(dt.Rows[i][0].ToString());
+        //    }
+        //    return (from m in Names
+        //            where m.StartsWith(prefixText, StringComparison.CurrentCultureIgnoreCase)
+        //            select m).Take(count).ToList();
+        //}
+        //catch (Exception ex)
+        //{
+        //    throw ex;
+        //}
+    }
+
+    [WebMethod]
+    public List<string> getPhoneNumbers(string prefixText, int count, string contextKey)
+    {
+
+        Data data = new Data();
+
+        List<NameValueDTO> d = data.GetDevoteePhoneNumber(prefixText);
+        List<string> Names = new List<string>();
+
+        d.ForEach(delegate(NameValueDTO dto)
+        {
+            Names.Add(dto.Name);
+        });
+
+        return Names;
+
+        //List<string> Phones1 = new List<string>();
+        //List<string> Phones2 = new List<string>();
+
+        //DataTable dt = new DataTable();
+        //string constr = ConfigurationManager.ConnectionStrings["ApplicationServices"].ToString();
+        //SqlConnection con = new SqlConnection(constr);
+        //con.Open();
+        //SqlCommand cmd = new SqlCommand("SELECT [Devotee_Phone1] FROM [dbo].[Devotee_Contact_Info] WHERE [Devotee_Phone1] LIKE @phone+'%'", con);
+        //cmd.Parameters.AddWithValue("@phone", prefixText);
+        //SqlDataAdapter adp = new SqlDataAdapter(cmd);
+        //try
+        //{
+        //    adp.Fill(dt);
+
+        //    for (int i = 0; i < dt.Rows.Count; i++)
+        //    {
+        //        Phones1.Add(dt.Rows[i][0].ToString());
+        //    }
+        //    //Second Query
+        //    cmd.CommandText = "SELECT [Devotee_Phone2] FROM [dbo].[Devotee_Contact_Info] WHERE [Devotee_Phone2] LIKE +'%'+@phone+'%'";
+        //    try
+        //    {
+        //        adp.Fill(dt);
+        //        for (int i = 0; i < dt.Rows.Count; i++)
+        //        {
+        //            Phones2.Add(dt.Rows[i][0].ToString());
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+
+        //    Phones1 = Phones1.Union(Phones2).ToList();
+        //    return (from m in Phones1
+        //            where m.StartsWith(prefixText, StringComparison.CurrentCultureIgnoreCase)
+        //            select m).Take(count).ToList();
+        //}
+        //catch (Exception ex)
+        //{
+        //    throw ex;
+        //}
+    }
+
+}

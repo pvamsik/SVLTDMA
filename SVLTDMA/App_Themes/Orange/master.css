@@ -1,0 +1,214 @@
+﻿/*body
+{
+    text-align: center;
+    font-family: Verdana;
+    font-size: 12px;
+    color:#555;
+}*/
+
+#wrapper
+{
+    margin: 0 auto;
+    width: 1080px;
+    text-align: left;
+}
+
+header
+{
+    margin-top: 10px;
+    border-radius: 10px 10px 0px 0px; 
+    -moz-border-radius: 10px 10px 0px 0px; 
+    -webkit-border-radius: 10px 10px 0px 0px;
+    border-right: 2px solid #000;
+    border-top: 2px solid #000;
+    border-left: 2px solid #000;
+    background-color: black;
+    /*
+    background-image: linear-gradient(bottom, rgb(227,178,32) 2%, rgb(171,110,36) 51%);
+    background-image: -o-linear-gradient(bottom, rgb(227,178,32) 2%, rgb(171,110,36) 51%);
+    background-image: -moz-linear-gradient(bottom, rgb(227,178,32) 2%, rgb(171,110,36) 51%);
+    background-image: -webkit-linear-gradient(bottom, rgb(227,178,32) 2%, rgb(171,110,36) 51%);
+    background-image: -ms-linear-gradient(bottom, rgb(227,178,32) 2%, rgb(171,110,36) 51%);
+    background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.02, rgb(227,178,32)), color-stop(0.51, rgb(171,110,36)) );
+    */
+    background-image: url("../../images/header.jpg");
+}
+
+header img
+{
+    float: left;
+    width: 90px;
+    height: 90px;
+    padding: 5px 10px;
+}
+
+header hgroup
+{
+    float: left;
+    margin-top: 20px;
+    width: 735px;
+    text-align: center;
+}
+
+header h1
+{
+    font-size: 18px;
+    color: #6D3C09;
+    padding-bottom: 5px;
+
+}
+
+header h2
+{
+    font-size: 15px;
+    color: #6D3C09;
+}
+
+header nav
+{
+    margin: 10px 0 0 0;
+    padding: 0px 0px;
+}
+
+header nav img
+{
+    height: 0px;
+}
+
+#cssmenu
+{
+    padding: 0 15px;
+    border-radius: 15px; 
+    -moz-border-radius: 15px; 
+    -webkit-border-radius: 15px;
+    float: left;
+}
+    .menuStyle
+    {
+        margin: 0 10px;
+        padding: 0px;
+        /*border: 1px solid red;*/
+        /*background-color: black;*/
+    }
+        .menuStaticItemStyle
+        {
+            color: white;
+            padding: 5px 15px !important;
+        }
+            .menuStaticSelectedItemStyle
+            {
+                background-color: #FFAAAA;
+            }
+
+            #leftMenu
+            {
+                float: left;
+                max-width: 70%;
+            }
+            #rightLogin
+            {
+                float: right;
+                max-width: 29%;
+            }
+.clear
+{
+    clear: both;
+}
+#loginDetails
+{
+    float: right;
+    padding: 6px 10px 0px 0px;
+    color: #fff;
+}
+    #loginDetails a
+    {
+        color: #fff;
+    }
+
+article
+{
+    background-color: #ffef8a;
+    padding: 10px;
+    border-right: 2px solid #000;
+    border-left: 2px solid #000;
+}
+
+    article h3
+    {
+        font-weight: bold;
+    }
+footer
+{
+    border-radius: 0px 0px 10px 10px;
+    -moz-border-radius: 0px 0px 10px 10px;
+    -webkit-border-radius: 0px 0px 10px 10px;
+    background-color: #ffef8a;
+    padding: 10px;
+    border-right: 2px solid #000;
+    border-bottom: 2px solid #000;
+    border-left: 2px solid #000;
+}
+
+#cleared
+{
+    clear: both;
+}
+
+.gvaltRowStyle
+{
+    background-color: white;
+}
+
+.gvrowStyle
+{
+    background-color: #EFF3FB;
+}
+.gvHdrFtrStyle
+{
+    background-color: #507CD1;
+    font-weight: bold;
+}
+.rdl-service-location
+{
+    list-style-type: none;
+}
+
+.xsmall-width
+{
+    width: 25px;
+}
+
+.small-width
+{
+    width: 50px;
+}
+
+.medium-width
+{
+    width: 75px;
+}
+
+.large-width
+{
+    width: 100px;
+}
+
+.xlarge-width
+{
+    width: 125px;
+}
+
+.xxlarge-width
+{
+    width: 150px;
+}
+
+.form-margin-bottom
+{
+    margin-bottom: 4px;
+}
+
+#LoginView1_LoginName1::first-letter
+{
+    text-transform: uppercase;
+}

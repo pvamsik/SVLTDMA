@@ -1,0 +1,923 @@
+﻿<%@ Page Title="Order Page" Language="C#" MasterPageFile="~/admin.master" AutoEventWireup="true" CodeFile="newOrder.aspx.cs" Inherits="devotee_checkoutPage" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+<%@ Register Src="~/Controls/DevoteeInformation.ascx" TagPrefix="uc1" TagName="DevoteeInformation" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script>
+        $(document).ready(function () {
+            var currentDate = new Date();
+            $("#ctl00_ContentPlaceHolder1_kioskOrder_txtServiceDate").datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: true
+            });
+            $("#ctl00_ContentPlaceHolder1_kioskOrder_txtServiceDate").datepicker("setDate", currentDate);
+            $("#ctl00_ContentPlaceHolder1_kioskOrder_txtCheckDate").datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: true
+            });
+            $("#ctl00_ContentPlaceHolder1_kioskOrder_txtCheckDate").datepicker("setDate", currentDate);
+            $("#tabs").tabs();
+
+            $("#serviceDate").datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: true
+            });
+            $("#serviceDate").datepicker("setDate", currentDate);
+
+            $("#checkDate").datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: true
+            });
+            $("#checkDate").datepicker("setDate", currentDate);
+
+            //$(".card").flip({
+            //    trigger: 'manual'
+            //}); test <div class="card"><span class="front">{{invoiceCount}}</span><span class="back">{{invoiceCount}}</span></div> test
+        });
+
+        /*
+        var myApp = angular.module("myModule", []);
+        myApp.controller("myController", function ($scope, $http, filterFilter) {
+
+            
+
+            $http.get("/WebServices/myServices.asmx/getServices")
+            .then(function (response) {
+                //console.log(response);
+                $scope.serviceTypes = response.data.ServiceTypes;
+                $scope.services = response.data.ServiceList;
+                $scope.paymentTypes = response.data.PaymentTypes;
+                $scope.creditCardTypes = response.data.CreditCardTypes;
+                $scope.serviceTypeChanged();
+            });
+
+            
+            $scope.cartList = [];
+            $scope.addToCart = function (serviceItem) {
+                
+                console.log(serviceItem);
+                $scope.cartList.push(serviceItem);
+                $scope.addToTotalAmount(serviceItem.Service.Service_Fee);
+            };
+
+            $scope.removeFromCart = function (serviceItem) {
+                //$scope.cartList.pop(service);
+                $scope.substractFromTotalAmount(serviceItem.Service.Service_Fee);
+                var index = $scope.cartList.indexOf(serviceItem);
+                $scope.cartList.splice(index, 1);
+            };
+
+            $scope.totalAmount = 0;
+            $scope.addToTotalAmount = function (amount) {
+                $scope.totalAmount += amount
+            };
+            $scope.substractFromTotalAmount = function (amount) {
+                $scope.totalAmount -= amount
+            };
+
+            
+            $scope.getCount = function (serviceId) {
+                //console.log(serviceId);
+                //console.log($scope.cartList.length);
+                var count = filterFilter($scope.cartList, { 'Service.Service_Type_ID': $scope.currentServiceType.Service_Type_ID, Service_ID: serviceId }, true).length;
+                //console.log(count);
+                //console.log($scope.cartList.length);
+                return count;
+            }
+
+            $scope.getCountServiceType = function (serviceTypeItem) {
+                //console.log(serviceId);
+                //console.log($scope.cartList.length);
+                var count = filterFilter($scope.cartList, { 'Service.Service_Type_ID': serviceTypeItem.Service_Type_ID }, true).length;
+                //console.log(count);
+                //console.log($scope.cartList.length);
+                return count;
+            }
+
+            $scope.currentServiceType;
+            $scope.serviceTypeChanged = function (serviceTypeItem) {
+                //alert(serviceTypeItem);
+                if (serviceTypeItem) {
+                    $scope.currentServiceType = serviceTypeItem;
+                } else {
+                    $scope.currentServiceType = filterFilter($scope.serviceTypes, { ShowDefault: true, IsActive: true }, true)[0];                    
+                }
+                //console.log($scope.currentServiceType);
+            }
+        });*/
+
+        //- {{(cartList|filter:{Service_ID:service.Service_ID}).length}}
+
+    </script>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <div ng-app="myModule" ng-controller="myController">
+        <!--<div class="panel panel-default">
+          <div class="panel-heading">Service Info</div>
+          <div class="panel-body">-->
+        <div class="row">
+            <div class="col-sm-6 padding-left-0">
+                <div class="form-group">
+                    <label for="servicedate">Service Date:</label>
+                    <div class="input-group">
+                        <span class="input-group-addon glyphicon glyphicon-calendar"></span>
+                        <input type="text" id="serviceDate" name="serviceDate" class="form-control" title="Service Date" />
+                        <!--<div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Service Type
+                            <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                            <li ng-repeat="serviceType in serviceTypes" ng-class="{active: serviceType.Service_Type_ID==currentServiceType.Service_Type_ID}"><a ng-click="serviceTypeChanged(serviceType)">{{serviceType.Service_type_description}} <span class="badge">{{getCountServiceType(serviceType)}}</span></a></li>
+                            </ul>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="servicedate">&nbsp;</label>
+                    <div class="input-group">
+                        <button type="button" class="btn btn-primary">Check Out&nbsp;&nbsp; <span class="badge">{{invoiceCount}}</span>&nbsp;&nbsp;<span class="badge total">{{invoiceTotal | currency}}</span></button>
+                    </div>
+                    <!--<div id="card"> 
+                      <div class="front"> 
+                        Front content
+                      </div> 
+                      <div class="back">
+                        Back content
+                      </div> 
+                    </div>-->
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 padding-left-0">
+                <ul class="nav nav-pills nav-stacked">
+                    <li ng-repeat="serviceType in serviceTypes" ng-class="{active: serviceType.Service_Type_ID==currentServiceType.Service_Type_ID}"><a ng-click="serviceTypeChanged(serviceType)">{{serviceType.Service_type_description}} <span class="badge servicetype_{{serviceType.Service_Type_ID}}">{{getCountServiceType(serviceType)}}</span></a></li>
+                </ul>
+            </div>
+            <div class="col-sm-8 padding-0">
+                <div ng-repeat="serviceItem in services|filter:{Service:{Service_Type_ID:currentServiceType.Service_Type_ID}}" class="col-sm-6 margin-0 padding-right-5 padding-left-5">
+                    <div class="orderitem">
+                        <div class="row margin-0 padding-0">
+                            <label for="servicedate">{{serviceItem.Service.Service_Name}}</label>
+                        </div>
+                        <div class="row margin-0 padding-0">
+                            <div class="col-sm-6 padding-0">
+                                <button type="button" class="btn btn-default" ng-click="addToCart(serviceItem)">Add <span class="badge service_{{serviceItem.Service.Service_Type_ID}}_{{serviceItem.Service_ID}}">{{getCount(serviceItem.Service_ID)}}</span></button>
+                                <button type="button" class="btn btn-default" ng-click="removeFromCart(serviceItem)" ng-show="getCount(serviceItem.Service.Service_ID)>0">Remove</button>
+                            </div>
+                            <div class="col-sm-6 padding-0 right bold">
+                                {{serviceItem.Service.Service_Fee | currency}}
+                                <!--<h3 class="margin-0"><span class="label label-default right padding-5">{{serviceItem.Service.Service_Fee | currency}}</span></h3>-->
+                            </div>
+                        </div>
+                        <!-- <input type="button" value="+" ng-click="addToCart(serviceItem)" title="Add this service to cart" /> -->
+                        <!--({{serviceItem.Service.Service_Fee | currency}})-->
+                        <!--<input type="button" value="-" ng-click="removeFromCart(serviceItem)" title="Remove this service from cart" ng-show="getCount(serviceItem.Service.Service_ID)>0"/>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Removed List <br />  
+        <div ng-repeat="cart in cartList track by $index" class="clearfix">
+           {{cart.Service_ID}} -  {{cart.Service_Name}} - {{cart.Service_Fee}}
+        </div> 
+        serviceItem in services|filter:{Service_Type_ID:currentServiceType.Service_Type_ID}
+            -->
+        <!--
+            <div ng-repeat="serviceItem in services|filter:{Service:{Service_Type_ID:currentServiceType.Service_Type_ID}}" class="clearfix">
+                {{serviceItem.Service.Service_ID}} - {{serviceItem.Service.Service_Name}} ({{serviceItem.Service.Service_Fee | currency}}) - {{getCount(serviceItem.Service.Service_ID)}}
+                    <input type="button" value="+" ng-click="addToCart(serviceItem)" title="Add this service to cart" />
+                    <input type="button" value="-" ng-click="removeFromCart(serviceItem)" title="Remove this service from cart" ng-show="getCount(serviceItem.Service.Service_ID)>0"/>
+            </div> -->
+        <div class="row">
+            <div class="col-sm-12">
+                <h2>Entire Cart Items</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr class="label-primary">
+                            <th width="5">Date</th>
+                            <th width="30">Service Name</th>
+                            <th width="20">Quantity</th>
+                            <th width="5">Price</th>
+                            <th width="15">Total</th>
+                            <th width="25">Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody ng-init="total = 0">
+                        <tr ng-repeat="cartItem in cartList track by $index">
+                            <td>{{cartItem.orderDate}}</td>
+                            <td>
+                                <div title="{{cartItem.Service.ServiceDescription}}">
+                                    {{cartItem.Service.Service_Name}}
+                                </div>
+                            </td>
+                            <td>
+
+                                <button type="button" class="btn btn-primary btn-sm" ng-click="addToCart(cartItem, true)" title="Add the Quantity by 1 at a time">Add</button>
+                                <input id="qty" type="number" class="form-control" name="qty" ng-model="cartItem.Quantity" ng-blur="setTotals(cartItem, true)">
+                                <button type="button" class="btn btn-default btn-sm" ng-click="removeFromCart(cartItem, true)" title="Remove the Quantity by 1 at a time">Del</button>
+
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <span class="input-group-addon">$</span>
+                                    <input id="price" type="number" class="form-control" name="price" ng-model="cartItem.Service.Service_Fee" ng-disabled="!cartItem.Service.PriceEditable" ng-keyup="setTotals()" placeholder="Amount for this Service">
+                                </div>
+                            </td>
+                            <td>
+                                <h5>{{(cartItem.Quantity * cartItem.Service.Service_Fee) | currency}} </h5>
+                            </td>
+                            <td>
+                                <textarea class="form-control" rows="2" id="comment" ng-model="cartItem.Service.comment"></textarea></td>
+                        </tr>
+                        <tr class="label-warning bold">
+                            <td colspan="2">Grand Total</td>
+                            <td>{{invoiceCount}}</td>
+                            <td>&nbsp;</td>
+                            <td>{{invoiceTotal | currency}}</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-repeat="infoItem in additionalInfoList" class="col-sm-12">
+
+                <div ng-if="infoItem.Service_ID == 130">
+                    <div class="form-group">
+                        <label for="servicedate">Name on the brick {{$index+1}}:</label>
+                        <input type="text" class="form-control" ng-model="brickName" />
+                    </div>
+                </div>
+                <div ng-if="infoItem.Service_ID == 165 || infoItem.Service_ID == 141 || infoItem.Service_ID == 171">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="servicedate">Name {{$index+1}}:</label>
+                            <input type="text" class="form-control" ng-model="brickName" />
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="servicedate">Date for Name {{$index+1}}:</label>
+                            <input type="text" class="form-control" ng-model="day" />
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="servicedate">Gothranaamaalu for Name {{$index+1}}:</label>
+                            <textarea class="form-control" rows="3" ng-model="gothraNamalu"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="servicedate">Comment 1:</label>
+                    <textarea class="form-control" rows="3" id="orderComment1" ng-model="orderComment1"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="servicedate">Comment 2:</label>
+                    <textarea class="form-control" rows="3" id="orderComment2" ng-model="orderComment2"></textarea>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="servicedate">Comment 3:</label>
+                    <textarea class="form-control" rows="3" id="orderComment3" ng-model="orderComment3"></textarea>
+                </div>
+            </div>
+        </div>
+        <!--    </div>
+        </div>-->
+        <hr />
+        <div class="row">
+            <ul class="nav nav-tabs nav-justified">
+                <li ng-repeat="paymentType in paymentTypes" ng-class="{active: paymentType.Payment_type_ID==currentPaymentType.Payment_type_ID}">
+                    <a ng-click="paymentTypeChanged(paymentType)">{{paymentType.Payment_type_description}}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="row">
+            <div ng-switch="currentPaymentType.Payment_type_code">
+                <div class="form-group">
+                    <label for="grandTotal1">Total Amount:</label>
+                    <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <input id="grandTotal" type="text" class="form-control" name="grandTotal" ng-model="invoiceTotal" placeholder="Total amount due" ng-disabled="true">
+                    </div>
+                </div>
+                <div ng-switch-when="CASH">
+                    <div class="form-group">
+                        <label for="amountTaken">Cash Paid:</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">$</span>
+                            <input type="number" class="form-control" id="amountTaken" name="amountTaken" ng-model="cashPayment" placeholder="Cash Paid">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="amountGiven">Change to return:</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">$</span>
+                            <input type="text" class="form-control" id="amountGiven" name="amountGiven" value="{{calculateChange(cashPayment)}}" ng-disabled="true" placeholder="Change to be returned">
+                        </div>
+                    </div>
+                </div>
+                <div ng-switch-when="CHECK">
+                    <div class="form-group">
+                        <label for="amountTaken">Check/Cheque #:</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">$</span>
+                            <input type="text" class="form-control" id="checkNo" name="checkNo" ng-model="checkNo" placeholder="Check/Cheque Number">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="amountGiven">Check/Cheque date:</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">$</span>
+                            <input type="text" class="form-control" id="checkDate" name="checkDate" ng-model="checkDate" placeholder="Check/Cheque date">
+                        </div>
+                    </div>
+                </div>
+                <div ng-switch-when="CREDIT CARD">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="list-group">
+                                <a ng-repeat="creditCardType in creditCardTypes" class="list-group-item" ng-class="{active: creditCardType.Credit_card_type_id==currentCreditCardType.Credit_card_type_id}"
+                                    ng-click="creditCardTypeChanged(creditCardType)">{{creditCardType.Credit_card_type_description}}</a>
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Swipe the card&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <input type="text" class="form-control" id="cardSwiped" name="cardSwiped" ng-model="cardSwiped" placeholder="Swipe the card">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Name on the card</span>
+                                    <input type="text" class="form-control" id="cardName" name="cardName" ng-model="cardName" placeholder="Name on the card">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Card Number&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <input type="text" class="form-control" id="cardNo" name="cardNo" ng-model="cardNo" placeholder="Card number">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Expiration Date&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <input type="text" class="form-control" id="cardExpDate" name="cardExpDate" ng-model="cardExpDate" placeholder="Card expiration date">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">CVV Number&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <input type="text" class="form-control" id="cardCvv" name="cardCvv" ng-model="cardCvv" placeholder="CVV number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-primary " ng-click="saveOrderData()" title="Submits the order for processing">Confirm the order</button>
+        </div>
+        <hr />
+    </div>
+    <uc1:DevoteeInformation runat="server" ID="DevoteeInformation" />
+    <div class="form-horizontal">
+        <asp:Wizard ID="kioskOrder" runat="server" DisplaySideBar="False" Height="100%" Width="100%" ActiveStepIndex="0" OnActiveStepChanged="kioskOrder_ActiveStepChanged">
+            <WizardSteps>
+                <asp:WizardStep ID="wsServiceSelection" runat="server" Title="Select Service">
+                    <asp:Panel runat="server" ID="pnlServiceList" CssClass="panel panel-primary">
+                        <div class="panel-heading lead">Select Service</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <asp:ValidationSummary ID="paymentPanelValidationSummary" HeaderText="You must fix the following issues before proceeding" runat="server" />
+                                <div id="errorMessage" runat="server" class="col-lg-12"></div>
+                            </div>
+                            <div class="form-group">
+                                <asp:Label runat="server" ID="lblServiceDate" Text="Service Date" SkinID="frmLabel" AssociatedControlID="txtServiceDate"></asp:Label>
+                                <div class="col-lg-1">
+                                    <asp:RequiredFieldValidator runat="server" ControlToValidate="txtServiceDate" ErrorMessage="Service Date is Required" ValidationGroup="serviceSelection">*</asp:RequiredFieldValidator>
+                                </div>
+                                <div class="col-lg-5">
+                                    <asp:TextBox runat="server" ID="txtServiceDate" Text="" CssClass="form-control serviceDate"></asp:TextBox>
+                                </div>
+                                <div class="col-lg-3">
+                                    <asp:LinkButton runat="server" ID="btnGotoCart" CssClass="btn btn-lg btn-info" OnClick="btnGotoCart_Click">
+                                        Check Out <span id="cartCount" class="badge" runat="server"></span>
+                                    </asp:LinkButton>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <asp:Label runat="server" ID="lblServiceType" Text="Service Type" SkinID="frmLabel" AssociatedControlID="rblServiceType"></asp:Label>
+                                <div class="col-lg-1"></div>
+                                <div class="col-lg-8">
+                                    <asp:RadioButtonList runat="server" ID="rblServiceType" AutoPostBack="True"
+                                        DataTextField="Service_type_description" DataValueField="Service_Type_ID"
+                                        OnSelectedIndexChanged="rblServiceType_SelectedIndexChanged" CssClass="list-inline" RepeatLayout="UnorderedList">
+                                    </asp:RadioButtonList>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <asp:Label runat="server" ID="lblService" Text="Service" SkinID="frmLabel" AssociatedControlID="lvServiceList"></asp:Label>
+                                <div class="col-lg-1"></div>
+                                <div class="col-lg-8">
+                                    <%--                                    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                                        <ContentTemplate>--%>
+                                    <asp:ListView ID="lvServiceList" runat="server" DataKeyNames="Service_ID, PriceEditable" EnableViewState="true" GroupItemCount="3" ItemPlaceholderID="itemPlaceholder">
+                                        <ItemTemplate>
+                                            <asp:LinkButton runat="server" ID="service"
+                                                CssClass="btn btn-primary wrap btnMargin"
+                                                data-service-name='<%# Eval("Service_Name") %>'
+                                                data-service-id='<%# Eval("Service_ID") %>'
+                                                data-service-fee='<%# Eval("Service_Fee") %>'
+                                                Width="300" Height="100px" OnCommand="service_Command">
+                                                            <%# Eval("Service_Name") %> <br /> <%# Eval("Service_Fee", "{0:c}") %>
+                                            </asp:LinkButton>
+                                        </ItemTemplate>
+                                        <EmptyDataTemplate>
+                                            <div class="form-group">
+                                                No Services found for the selected Date
+                                            </div>
+                                        </EmptyDataTemplate>
+                                        <GroupSeparatorTemplate>
+                                            <br />
+                                            <br />
+                                        </GroupSeparatorTemplate>
+                                        <GroupTemplate>
+                                            <div id="itemPlaceholder" runat="server" class="form-group"></div>
+                                        </GroupTemplate>
+                                    </asp:ListView>
+                                    <%--                                        </ContentTemplate>
+                                        <Triggers>
+                                            <asp:AsyncPostBackTrigger ControlID="rblServiceType" EventName="SelectedIndexChanged" />
+                                        </Triggers>
+                                    </asp:UpdatePanel>--%>
+                                </div>
+                            </div>
+                        </div>
+                    </asp:Panel>
+                </asp:WizardStep>
+                <asp:WizardStep ID="wsShoppingCart" runat="server" Title="Shopping Cart">
+                    <asp:Panel runat="server" ID="pnlShoppingCart" CssClass="panel panel-default">
+                        <div class="panel-heading lead">Selected Service List</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="col-lg-4">
+                                    <asp:Button runat="server" ID="btnContinueShopping" Text="Add More Services..." CssClass="btn btn-lg btn-info" OnClick="btnContinueShopping_Click" />
+                                </div>
+                                <div class="col-lg-4 text-center">
+                                    <div class="btn-group">
+                                        <%--<asp:Button runat="server" ID="btnUpdateCart" Text="Update Services" OnClick="btnUpdateCart_Click" CssClass="btn btn-lg btn-warning" />--%>
+                                        <asp:Button runat="server" ID="btnEmptyCart" Text="Remove all Services" OnClick="btnEmptyCart_Click" CssClass="btn btn-lg btn-danger" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 text-right">
+                                    <asp:Button runat="server" ID="btnCheckOut" Text="Proceed to payment" OnClick="btnCheckOut_Click" CssClass="btn btn-lg btn-primary" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-12">
+                                    <asp:GridView ID="CartList" runat="server" AutoGenerateColumns="False" ShowFooter="True" GridLines="Vertical" CellPadding="4" DataKeyNames="Service_ID,orderDate"
+                                        DataSourceID="CartSource" OnRowDataBound="CartList_RowDataBound" OnRowDeleted="CartList_RowDeleted" OnRowDeleting="CartList_RowDeleting" RowStyle-CssClass="special">
+                                        <Columns>
+                                            <asp:CommandField ShowDeleteButton="True" />
+                                            <asp:BoundField DataField="orderDate" HeaderText="Order Date" SortExpression="orderDate" />
+                                            <asp:BoundField DataField="Service_ID" HeaderText="Service ID" SortExpression="Service_ID" />
+                                            <asp:BoundField DataField="Service.Service_Name" HeaderText="Service" />
+                                            <asp:TemplateField HeaderText="Quantity">
+                                                <ItemTemplate>
+                                                    <asp:TextBox ID="Quantity" Width="100" runat="server" Text='<%# Eval("Quantity") %>' CssClass="text-right" OnTextChanged="Quantity_TextChanged" AutoPostBack="true"></asp:TextBox>
+                                                    <asp:FilteredTextBoxExtender ID="ftbeQuantity" runat="server" TargetControlID="Quantity" FilterType="Numbers"></asp:FilteredTextBoxExtender>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Price" ItemStyle-CssClass="text-left" HeaderStyle-CssClass="text-left">
+                                                <ItemTemplate>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">$</span>
+                                                        <asp:TextBox runat="server" ID="itemPrice" CssClass="text-right" Text='<%# Eval("Service.Service_Fee") %>' OnTextChanged="itemPrice_TextChanged" AutoPostBack="true"
+                                                            Width="100" Enabled='<%# Eval("Service.PriceEditable") %>'></asp:TextBox>
+                                                        <asp:FilteredTextBoxExtender ID="ftbeItemPrice" runat="server" TargetControlID="itemPrice" FilterType="Numbers, Custom" ValidChars="."></asp:FilteredTextBoxExtender>
+                                                    </div>
+                                                </ItemTemplate>
+                                                <HeaderStyle CssClass="text-left"></HeaderStyle>
+                                                <ItemStyle CssClass="text-left"></ItemStyle>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Item Total">
+                                                <ItemTemplate>
+                                                    <%# String.Format("{0:C}", ((Convert.ToDouble(Eval("Quantity"))) * Convert.ToDouble(Eval("Service.Service_Fee")))) %>
+                                                </ItemTemplate>
+                                                <FooterStyle CssClass="text-right"></FooterStyle>
+                                                <HeaderStyle CssClass="text-right"></HeaderStyle>
+                                                <ItemStyle CssClass="text-right"></ItemStyle>
+                                            </asp:TemplateField>
+                                            <asp:TemplateField HeaderText="Service Comment">
+                                                <ItemTemplate>
+                                                    <asp:TextBox runat="server" ID="itemComment" Text='<%# Eval("comment") %>' CssClass="form-control" AutoPostBack="true" OnTextChanged="itemComment_TextChanged"
+                                                        TextMode="MultiLine" Rows="2" MaxLength="300"></asp:TextBox>
+                                                </ItemTemplate>
+                                            </asp:TemplateField>
+                                        </Columns>
+                                        <FooterStyle Font-Bold="true" CssClass="table-bordered" />
+                                        <EmptyDataTemplate>
+                                            <div class="text-center">
+                                                You Cart is Empty.
+                                            </div>
+                                        </EmptyDataTemplate>
+                                    </asp:GridView>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-lg-2">Order Comment 1</label>
+                                        <div class="col-lg-10">
+                                            <asp:TextBox ID="txtOrderComment1" runat="server" TextMode="MultiLine" CssClass="form-control" Rows="4" MaxLength="300"></asp:TextBox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-lg-2">Order Comment 2</label>
+                                        <div class="col-lg-10">
+                                            <asp:TextBox ID="txtOrderComment2" runat="server" TextMode="MultiLine" CssClass="form-control" Rows="4" MaxLength="300"></asp:TextBox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label for="" class="control-label col-lg-2">Order Comment 3</label>
+                                        <div class="col-lg-10">
+                                            <asp:TextBox ID="txtOrderComment3" runat="server" TextMode="MultiLine" CssClass="form-control" Rows="4" MaxLength="300"></asp:TextBox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                Please provide any additional instrcutions for your order.
+                                <br />
+                                Example:
+                                <br />
+                                Brick Donation: Please provide the names to appear on the Brick
+                                <br />
+                                Udayastamana Seva: Please provide name, nakshatram and gothram of the person for whom the prayers will be performed.
+                            </div>
+                        </div>
+                    </asp:Panel>
+                    <asp:ObjectDataSource ID="CartSource" runat="server" SelectMethod="GetCartItems" TypeName="CommonDTO.shoppingCart" DeleteMethod="RemoveFromCart">
+                        <DeleteParameters>
+                            <asp:Parameter Name="id" Type="Int32" />
+                            <asp:Parameter Name="orderDate" Type="String" />
+                        </DeleteParameters>
+                    </asp:ObjectDataSource>
+                </asp:WizardStep>
+                <asp:WizardStep ID="wsPaymentOption" runat="server" Title="Payment Option">
+                    <asp:Panel runat="server" ID="pnlPaymentOption" CssClass="panel panel-primary">
+                        <div class="panel-heading lead">Payment Option</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="col-lg-4">
+                                    <asp:Button ID="btnGobacktoCart" runat="server" Text="Back to Cart" CssClass="btn btn-lg btn-info" OnClick="btnGobacktoCart_Click" />
+                                </div>
+                                <div class="col-lg-8">
+                                    <div class="btn-group">
+                                        <asp:DataList runat="server" ID="dlPaymentOptions" DataKeyField="Payment_type_ID" DataSourceID="sdsPaymentOptions"
+                                            RepeatColumns="4" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                                            <ItemTemplate>
+                                                <asp:Button runat="server" ID="paymentType" CssClass="btn btn-primary btn-lg"
+                                                    Text='<%# Eval("Payment_type_description")%>' data-order-serviceType='<%# Eval("Payment_type_ID") %>'
+                                                    OnClick="paymentType_Click" data-order-paymentType='<%# Eval("Payment_type_code") %>' />
+                                            </ItemTemplate>
+                                        </asp:DataList>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </asp:Panel>
+                    <asp:SqlDataSource ID="sdsPaymentOptions" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" SelectCommand="GetPaymentTypes" SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+                </asp:WizardStep>
+                <asp:WizardStep ID="wsCheckPaymentInfo" runat="server" Title="Check Payment Information">
+                    <asp:Panel runat="server" ID="pnlCheckPaymentInfo" CssClass="panel panel-primary">
+                        <div class="panel-heading lead">Check Information</div>
+                        <div class="panel-body">
+                            <div class="form-group col-lg-12">
+                                <asp:LinkButton runat="server" ID="btnChkChangePaymentType" CausesValidation="False" CssClass="btn btn-lg btn-info"
+                                    Text="Change Payment Type" OnClick="btnChkChangePaymentType_Click"></asp:LinkButton>
+                            </div>
+                            <div class="form-group">
+                                <asp:ValidationSummary ID="vsCheckInfo" runat="server" HeaderText="Please fix the issues below:" />
+                            </div>
+                            <div class="form-group">
+                                <asp:Label runat="server" ID="lblCheckNumber" AssociatedControlID="txtCheckNumber" SkinID="frmLabel" Text="Check Number"></asp:Label>
+                                <div class="col-lg-1">
+                                    <asp:RequiredFieldValidator ID="rfvCheckNumber" runat="server" ControlToValidate="txtCheckNumber" Text="Check Number is Required" SetFocusOnError="True">*</asp:RequiredFieldValidator>
+                                </div>
+                                <div class="col-lg-8">
+                                    <asp:TextBox runat="server" ID="txtCheckNumber" Text="" CssClass="form-control"></asp:TextBox>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <asp:Label runat="server" ID="lblCheckDate" AssociatedControlID="txtCheckDate" SkinID="frmLabel" Text="Check Date"></asp:Label>
+                                <div class="col-lg-1">
+                                    <asp:RequiredFieldValidator ID="rfvCheckDate" runat="server" ControlToValidate="txtCheckDate" Text="Check Date is Required" SetFocusOnError="True"></asp:RequiredFieldValidator>
+                                </div>
+                                <div class="col-lg-8">
+                                    <asp:TextBox runat="server" ID="txtCheckDate" Text="" CssClass="form-control"></asp:TextBox>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-2"></div>
+                                <div class="col-lg-10">
+                                    <asp:Button runat="server" ID="cmdCheckSubmit" Text="Check Out" CssClass="btn btn-primary btn-lg" CausesValidation="true" OnClick="cmdCheckSubmit_Click" />
+                                    <asp:Button runat="server" ID="cmdCheckReset" Text="Reset" CssClass="btn btn-lg btn-default" CausesValidation="false" OnClick="cmdCheckReset_Click" />
+                                </div>
+                            </div>
+                        </div>
+                    </asp:Panel>
+                </asp:WizardStep>
+                <asp:WizardStep ID="wsCCDetails" runat="server" Title="Credit Card Details">
+                    <asp:Panel runat="server" ID="pnlCCDetails" CssClass="panel panel-primary">
+                        <div class="panel-heading lead">Credit Card Details</div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <div class="col-lg-6">
+                                    <asp:LinkButton runat="server" ID="btnCCChangePaymentType" CausesValidation="False" CssClass="btn btn-lg btn-info" OnClick="btnCCChangePaymentType_Click" Text="Change Payment Type"></asp:LinkButton>
+                                </div>
+                                <div class="col-lg-6 text-right">
+                                    <asp:Button runat="server" ID="btnResetPaymentForm" Text="Reset" CssClass="btn btn-lg" CausesValidation="false" OnClick="btnResetPaymentForm_Click" />
+                                    <asp:Button runat="server" ID="btnCCPaymentFormSubmit" Text="Continue" CssClass="btn btn-primary btn-lg" CausesValidation="true" OnClick="btnCCPaymentFormSubmit_Click" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <asp:Label runat="server" ID="lblCCReader" SkinID="frmLabel" AssociatedControlID="txtCCReader" Text="Swipe your Credit Card" />
+                                <div class="col-lg-9">
+                                    <asp:TextBox runat="server" ID="txtCCReader" CausesValidation="false" placeholder="Please swipe your credit card" AutoPostBack="true"
+                                        CssClass="form-control" OnTextChanged="txtCCReader_TextChanged" />
+                                </div>
+                            </div>
+                            <asp:UpdatePanel runat="server" ID="upCCDetails">
+                                <ContentTemplate>
+                                    <div class="form-group">
+                                        <asp:Label runat="server" ID="Name" SkinID="frmLabel" AssociatedControlID="txtCCName" Text="Full Name" />
+                                        <asp:RequiredFieldValidator ID="nameValidator" runat="server" ControlToValidate="txtCCName"
+                                            ValidationGroup="" ErrorMessage="Please enter your full name. Ex: Last Name/First Name" Display="Dynamic">*</asp:RequiredFieldValidator>
+                                        <div class="col-lg-9">
+                                            <asp:TextBox runat="server" ID="txtCCName" type="text" placeholder="Your Full Name" CssClass="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <asp:Label runat="server" ID="lblCCNumber" SkinID="frmLabel" AssociatedControlID="txtCCNumber" Text="Credit Card" />
+                                        <asp:RequiredFieldValidator ID="cardNumberValidator" runat="server" ControlToValidate="txtCCNumber"
+                                            ErrorMessage="Please enter your Credit Card Number or Swipe your card above." Display="Dynamic">*</asp:RequiredFieldValidator>
+                                        <div class="col-lg-9">
+                                            <asp:TextBox runat="server" ID="txtCCNumber" type="number" placeholder="Credit Card Number" CssClass="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <asp:Label runat="server" ID="lblCCExpirationDate" SkinID="frmLabel" AssociatedControlID="txtCCExpDate" Text="Expiration Date" />
+                                        <asp:RequiredFieldValidator ID="ExpDtValidator" runat="server" ControlToValidate="txtCCExpDate" ErrorMessage="Please enter the Card Expiration Date" Display="Dynamic">*</asp:RequiredFieldValidator>
+                                        <div class="col-lg-9">
+                                            <asp:TextBox runat="server" ID="txtCCExpDate" placeholder="Credit Card Expiration Date" CssClass="form-control" />
+                                            <span>Please enter in yymm format</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <asp:Label runat="server" ID="Label1" SkinID="frmLabel" AssociatedControlID="txtCVV" Text="Card CVV" />
+                                        <asp:RequiredFieldValidator ID="cvvValidator" runat="server" ControlToValidate="txtCVV" ErrorMessage="Please enter the Card CVV Date" Display="Dynamic">*</asp:RequiredFieldValidator>
+                                        <div class="col-lg-9">
+                                            <asp:TextBox runat="server" ID="txtCVV" type="number" placeholder="Your Card CVV. Ex: 123 or 4567" CssClass="form-control" />
+                                            <span style="text-align: left;">CVV is your Card Verification Number.
+                                                            <br />
+                                                For Discover, Master Card or Visa, this is a 3 digit number located on the back of the card. Ex: 123
+                                                            <br />
+                                                For American Express, this will be a 4 digit number located on the top right of your Credit Card Number. Ex: 1234
+                                            </span>
+                                        </div>
+                                    </div>
+                                </ContentTemplate>
+                                <Triggers>
+                                    <asp:AsyncPostBackTrigger ControlID="txtCCReader" EventName="TextChanged" />
+                                </Triggers>
+                            </asp:UpdatePanel>
+                        </div>
+                    </asp:Panel>
+                </asp:WizardStep>
+            </WizardSteps>
+            <StartNavigationTemplate />
+            <StepNavigationTemplate />
+            <FinishNavigationTemplate />
+        </asp:Wizard>
+    </div>
+
+    <script type="text/javascript">
+
+        // Called by plugin on a successful scan.
+        var complete = function (data) {
+
+            // Is it a payment card?
+            if (data.type == "generic")
+                return;
+
+            // Copy data fields to form
+            $("#cardName").val(data.firstName + " " + data.lastName);
+            //$("#lastName").val(data.lastName);
+            $("#cardNo").val(data.account);
+            $("#cardExpDate").val(data.expMonth + data.expYear);
+            //$("#expYear").val(data.expYear);
+            //$("#type").val(data.type);
+        };
+
+        // Event handler for scanstart.cardswipe.
+        var scanstart = function () {
+            $("#overlay").fadeIn(200);
+        };
+
+        // Event handler for scanend.cardswipe.
+        var scanend = function () {
+            $("#overlay").fadeOut(200);
+        };
+
+        // Event handler for success.cardswipe.  Displays returned data in a dialog
+        var success = function (event, data) {
+
+            $("#properties").empty();
+
+            // Iterate properties of parsed data
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    var text = key + ': ' + data[key];
+                    $("#properties").append('<div class="property">' + text + '</div>');
+                }
+            }
+
+
+            $("#success").fadeIn().delay(3000).fadeOut();
+        }
+
+        var failure = function () {
+            $("#failure").fadeIn().delay(1000).fadeOut();
+        }
+
+        // Initialize the plugin with default parser and callbacks.
+        //
+        // Set debug to true to watch the characters get captured and the state machine transitions
+        // in the javascript console. This requires a browser that supports the console.log function.
+        //
+        // Set firstLineOnly to true to invoke the parser after scanning the first line. This will speed up the
+        // time from the start of the scan to invoking your success callback.
+        $.cardswipe({
+            firstLineOnly: true,
+            success: complete,
+            parsers: ["visa", "amex", "mastercard", "discover", "generic"],
+            debug: false
+        });
+
+        // Bind event listeners to the document
+        $(document)
+			.on("scanstart.cardswipe", scanstart)
+			.on("scanend.cardswipe", scanend)
+			.on("success.cardswipe", success)
+			.on("failure.cardswipe", failure)
+        ;
+    </script>
+
+
+
+
+    <%--                                                <asp:GridView runat="server" ID="gvServiceList" DataKeyNames="Service_ID" AutoGenerateColumns="false"
+                                                OnRowCommand="gvServiceList_RowCommand" CssClass="table table-striped table-hover">
+                                                <AlternatingRowStyle BackColor="White" />
+                                                <Columns>
+                                                    <asp:BoundField DataField="Service_ID" HeaderText="Service" ItemStyle-CssClass="col-lg-1">
+                                                        <HeaderStyle CssClass="hidden" />
+                                                        <ItemStyle CssClass="hidden" />
+                                                    </asp:BoundField>
+                                                    <asp:BoundField DataField="Service_Name" HeaderText="Service Name" ItemStyle-CssClass="col-lg-7">
+                                                        <ItemStyle CssClass="col-lg-7"></ItemStyle>
+                                                    </asp:BoundField>
+                                                    <asp:BoundField DataField="Service_Fee" DataFormatString="{0:c}" HeaderText="Fee" HeaderStyle-CssClass="text-right" ItemStyle-CssClass="col-lg-1 text-right"></asp:BoundField>
+                                                    <%--<asp:ButtonField CommandName="Buy" ItemStyle-CssClass="col-lg-1" Visible="false" Text="Buy Now" />
+    <asp:ButtonField CommandName="Add" ItemStyle-CssClass="col-lg-2" CausesValidation="true" Text="Add to Cart">
+        <itemstyle cssclass="col-lg-2"></itemstyle>
+    </asp:ButtonField>
+    </Columns>
+                                                <emptydatatemplate>
+                                                    No Services found for the selected Date
+                                                </emptydatatemplate>
+    </asp:GridView>--%>
+    <%--    <div class="form-horizontal">
+        <div class="form-group">
+            <asp:Label ID="lblPaymentType" runat="server" SkinID="frmLabel" Text="Payment Type" />
+            <div class="col-lg-10">
+                <div class="radio">
+                    <label>
+                        <asp:RadioButtonList ID="rdlPaymentType" runat="server" AutoPostBack="true"
+                            DataTextField="Payment_type_description" DataValueField="Payment_type_ID"
+                            OnSelectedIndexChanged="rdlPaymentType_SelectedIndexChanged">
+                        </asp:RadioButtonList>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <asp:Panel ID="pnlCheck" runat="server" Visible="false" CssClass="form-group">
+            <div class="form-group">
+                <asp:Label ID="lblCheckNumber" runat="server" SkinID="frmLabel" Text="Check Number" />
+                <div class="col-lg-10">
+                    <asp:TextBox ID="txtCheckNumber" runat="server" CssClass="form-control"></asp:TextBox>
+                </div>
+            </div>
+            <div class="form-group">
+                <asp:Label ID="lblCheckDate" runat="server" SkinID="frmLabel" Text="Check Date" />
+                <div class="col-lg-10">
+                    <asp:TextBox ID="txtCheckDate" runat="server" CssClass="date form-control"></asp:TextBox>
+                </div>
+            </div>
+        </asp:Panel>
+        <asp:Panel ID="pnlCard" runat="server" Visible="true" CssClass="form-group">
+            <div class="form-group">
+                <asp:Label ID="lblCCType" runat="server" SkinID="frmLabel" Text="Credit Card Type" />
+                <div class="col-lg-10">
+                    <div class="radio">
+                        <label>
+                            <asp:RadioButtonList ID="rdlCCType" runat="server" AutoPostBack="true"
+                                DataTextField="Credit_card_type_description" DataValueField="Credit_card_type_id"
+                                OnSelectedIndexChanged="rdlCCType_SelectedIndexChanged">
+                            </asp:RadioButtonList>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                Option 1: Swipe Credit Card below in Swipe Credit Card field to populate the Case Information in Option 2<br />
+            </div>
+            <div class="form-group">
+                <asp:Label ID="lblmdl" runat="server" SkinID="frmLabel" Text="Swipe Credit Card" />
+                <div class="col-lg-10">
+                    <asp:TextBox ID="txtCCSwipe" runat="server" AutoPostBack="true" OnTextChanged="txtCCSwipe_TextChanged" CssClass="form-control" />
+                </div>
+            </div>
+            <div class="form-group text-center">
+                or<br />
+            </div>
+            <div class="reqfrmDetailBlock clear tr-credit">
+                Option 2: Manually Enter the Card Information<br />
+                <br />
+                <asp:Label ID="lblCardHolderName" runat="server" SkinID="frmLabel" Text="Card Holder Name" />
+                <asp:TextBox ID="txtCardHolderName" runat="server"></asp:TextBox>
+                <asp:CustomValidator ID="cvCardHolderName" runat="server" ControlToValidate="txtCardHolderName" EnableViewState="true" ErrorMessage="Please enter Card Holder Name" OnServerValidate="cvCardHolderName_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+            </div>
+            <br />
+            <div class="reqfrmDetailBlock clear tr-credit">
+                <asp:Label ID="lblCardNumber" runat="server" SkinID="frmLabel" Text="Card Number" />
+                <asp:TextBox ID="txtCardNumber" runat="server"></asp:TextBox>
+                <asp:CustomValidator ID="cvCardNumber" runat="server" ControlToValidate="txtCardNumber" EnableViewState="true" ErrorMessage="Please enter Card Number" OnServerValidate="cvCardNumber_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+            </div>
+            <br />
+            <div class="reqfrmDetailBlock clear tr-credit">
+                <asp:Label ID="lblCardExpDate" runat="server" SkinID="frmLabel" Text="Card Exp Date" />
+                <asp:DropDownList ID="ddlCCExpMonth" runat="server">
+                    <asp:ListItem Value="01">January</asp:ListItem>
+                    <asp:ListItem Value="02">February</asp:ListItem>
+                    <asp:ListItem Value="03">March</asp:ListItem>
+                    <asp:ListItem Value="04">April</asp:ListItem>
+                    <asp:ListItem Value="05">May</asp:ListItem>
+                    <asp:ListItem Value="06">June</asp:ListItem>
+                    <asp:ListItem Value="07">July</asp:ListItem>
+                    <asp:ListItem Value="08">August</asp:ListItem>
+                    <asp:ListItem Value="09">September</asp:ListItem>
+                    <asp:ListItem Value="10">October</asp:ListItem>
+                    <asp:ListItem Value="11">November</asp:ListItem>
+                    <asp:ListItem Value="12">December</asp:ListItem>
+                </asp:DropDownList>
+                <asp:DropDownList ID="ddlCCExpYear" runat="server">
+                    <asp:ListItem Value="16">2016</asp:ListItem>
+                    <asp:ListItem Value="17">2017</asp:ListItem>
+                    <asp:ListItem Value="18">2018</asp:ListItem>
+                    <asp:ListItem Value="19">2019</asp:ListItem>
+                    <asp:ListItem Value="20">2020</asp:ListItem>
+                    <asp:ListItem Value="21">2021</asp:ListItem>
+                    <asp:ListItem Value="22">2022</asp:ListItem>
+                    <asp:ListItem Value="23">2023</asp:ListItem>
+                </asp:DropDownList>
+                <asp:TextBox ID="txtCardExpDate" runat="server" Visible="false"></asp:TextBox>
+            </div>
+            <br />
+            <div class="reqfrmDetailBlock clear tr-credit">
+                <asp:Label ID="lblCVVNumber" runat="server" SkinID="frmLabel" Text="Card CVV Number" />
+                <asp:TextBox ID="txtCardCVVNumber" runat="server"></asp:TextBox>
+                <asp:CustomValidator ID="cvCVVValidator" runat="server" ControlToValidate="txtCardCVVNumber" EnableViewState="true" ErrorMessage="Please enter Card CVV Number" OnServerValidate="cvCVVValidator_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+            </div>
+        </asp:Panel>
+    </div>--%>
+    <asp:SqlDataSource ID="ServiceTypesList" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" SelectCommand="KioskServiceTypes" SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+</asp:Content>

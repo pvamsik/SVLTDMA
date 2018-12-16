@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <title>{AppName}</title>
+    <style type="text/css">
+        .auto-style1 {
+            width: 400px;
+        }
+
+        .auto-style2 {
+            width: 200px;
+            text-align: right;
+        }
+        .header {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <header>
+            <div id="banner">
+                <img style="float: left; width: 90px; height: 90px; padding: 5px 10px;"
+                     src="http://svlotustemple.org/images/logo2.png"
+                     alt="Sri Venkateswara Lotus Temple" />
+                <hgroup style="float: left;">
+                    <h1 style="font-family: 'Old English Text MT', Calibri, Arial; font-size: 1.75em; padding-bottom: 5px;">
+                        <span id="Span1">Sri Venkateswara Lotus Temple</span>
+                    </h1>
+                    <h2 style="font-size: 1em;">
+                        <span id="Span2">12501 Braddock Road, Fairfax, VA - 22030. Phone: 703-815-4850</span>
+                    </h2>
+                </hgroup>
+            </div>
+            <div id="cleared"></div>
+        </header>
+        <div style="clear: both"></div>
+        <article>
+            <h3>Hello {UserName},</h3>
+            <p>This is an email confirmation of your refund amount of {refundAmount} from Sri Venkateswara Lotus Temple!</p>
+            <p>
+                Thank You<br />
+                Sri Venkateswara Lotus Temple
+            </p>
+        </article>
+        <footer>
+            <p>
+                &copy; 2016 Sri Venkateswara Lotus Temple. All rights reserved.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

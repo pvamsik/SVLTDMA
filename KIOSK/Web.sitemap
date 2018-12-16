@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+  <siteMapNode url="~/Secure/Kiosk.aspx" title="Home" roles="Volunteers" description="">
+  </siteMapNode>
+</siteMap>

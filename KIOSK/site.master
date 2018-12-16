@@ -1,0 +1,67 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" EnableTheming="true" CodeFile="site.master.cs" Inherits="site" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="<%$ AppSettings: institutionFavIcon %>" rel="shortcut icon" type="image/x-icon" />
+    <link rel="icon" type="image/icon" href="<%$ AppSettings: institutionFavIcon %>" />
+    <title runat="server"><%: Page.Title %>-
+        <asp:Literal ID="Literal1" runat="server" Text="<%$ AppSettings: institutionName%>" /></title>
+    <asp:PlaceHolder runat="server">
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/jquery-3.1.1.min.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/jquery-ui-1.12.1.min.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/bootstrap.min.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/angular.min.js") %>"></script>
+    </asp:PlaceHolder>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <nav class="navbar navbar-default">
+            <div class="col-lg-2 text-center">
+                <asp:LinkButton ID="logoBtn" runat="server" PostBackUrl="~/Default.aspx"><img runat="server" src="<%$ AppSettings: institutionLogo %>" /></asp:LinkButton>
+            </div>
+            <div class="col-lg-6 text-left">
+                <asp:Menu ID="cssmenu" Width="100%" CssClass="" runat="server" DataSourceID="siteMenuDataSource" EnableViewState="False"
+                    Orientation="Horizontal" StaticDisplayLevels="2" StaticSubMenuIndent="10px" DynamicHorizontalOffset="2"
+                    SkipLinkText="" StaticEnableDefaultPopOutImage="False" IncludeStyleBlock="False" DynamicMenuStyle-CssClass="dropdown-menu">
+                    <StaticMenuStyle CssClass="nav navbar-nav" />
+                </asp:Menu>
+            </div>
+            <div class="col-lg-4 text-right">
+                <asp:LoginView ID="siteLoginView" runat="server">
+                    <AnonymousTemplate>
+                        <asp:LinkButton ID="btnLogin" runat="server" Text="Login" CssClass="nav navbar-brand" PostBackUrl="~/Default.aspx">Login</asp:LinkButton>
+                    </AnonymousTemplate>
+                    <LoggedInTemplate>
+                        <a class="nav navbar-brand" href="<%= ResolveUrl( Resources.Links.ManageProfile ) %>">Welcome
+                            <asp:Label ID="Fullname" runat="server"></asp:Label><asp:LoginName ID="LoginName" runat="server" />
+                            !
+                        </a>
+                        <asp:LoginStatus ID="LoginStatus1" runat="server" CssClass="nav navbar-brand"
+                            LogoutAction="Redirect" LogoutPageUrl="~/Default.aspx" />
+                    </LoggedInTemplate>
+                </asp:LoginView>
+            </div>
+
+        </nav>
+        <div class="container-fluid">
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+        <footer>
+            <hr />
+            <div class="col-lg-12">
+                <p class="text-right">
+                    &copy; 2018
+                    <asp:Literal runat="server" Text="<%$ AppSettings: InstitutionName %>" />. All Right Reserved.
+                </p>
+            </div>
+        </footer>
+        <asp:SiteMapDataSource ID="siteMenuDataSource" runat="server" />
+    </form>
+</body>
+</html>

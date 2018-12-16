@@ -1,0 +1,210 @@
+﻿<%@ Page Title="Add Service" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="devoteeAddService.aspx.cs" Inherits="devoteeAddService" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <link href="../Styles/devoteeInfoStyle.css" rel="stylesheet" />
+    <link href="../Styles/reqForm.css" rel="stylesheet" />
+    <style>
+        .CCPanel
+        {
+            border-width: 4px;
+            border-color: chocolate;
+            padding: 10px;
+        }
+    </style>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <asp:FormView ID="FormView1" DataSourceID="SDS_DevoteeInfo" runat="server">
+        <ItemTemplate>
+            <div class="frmDevoteeDetail">
+                <div class="frmDevoteeDetailBlock clear">
+                    <div class="frmDevoteeDetailLeft">
+                        <asp:Label ID="lblName" runat="server" Text="Name:" SkinID="frmLabel" />
+                    </div>
+                    <div class="frmDevoteeDetailRight">
+                        <asp:Label ID="lblDITitle" runat="server" Text='<%# Eval("devotee_title") %>'></asp:Label>
+                        <asp:Label ID="lblDIFName" runat="server" Text='<%# Eval("Devotee_first_name") %>'></asp:Label>
+                        <asp:Label ID="lblDIMName" runat="server" Text='<%# Eval("Devotee_m_name") %>'></asp:Label>
+                        <asp:Label ID="lblDILName" runat="server" Text='<%# Eval("Devotee_last_name") %>'></asp:Label>
+                    </div>
+                </div>
+                <div class="frmDevoteeDetailBlock clear">
+                    <div class="frmDevoteeDetailLeft">
+                        <asp:Label ID="lblPhone" runat="server" Text="Phone:" SkinID="frmLabel" />
+                    </div>
+                    <div class="frmDevoteeDetailRight">
+                        <asp:Label ID="lblDIPhone" runat="server" Text='<%# Eval("devotee_phone1") %>'></asp:Label>
+                    </div>
+                </div>
+                <div class="frmDevoteeDetailBlock clear">
+                    <div class="frmDevoteeDetailLeft">
+                        <asp:Label ID="lblEmail" runat="server" Text="Email:" SkinID="frmLabel" />
+                    </div>
+                    <div class="frmDevoteeDetailRight">
+                        <asp:Label ID="lblDIEmail" runat="server" Text='<%# Eval("devotee_email1") %>'></asp:Label><br />
+                        <asp:Label ID="lblDIEmail2" runat="server" Text='<%# Eval("devotee_email2") %>'></asp:Label>
+                    </div>
+                </div>
+                <div class="frmDevoteeDetailBlock clear">
+                    <div class="frmDevoteeDetailLeft">
+                        <asp:Label ID="lblAddress" runat="server" Text="Address:" SkinID="frmLabel" />
+                    </div>
+                    <div class="frmDevoteeDetailRight">
+                        <asp:Label ID="lblDIAddress1" runat="server" Text='<%# Eval("devotee_address1") %>'></asp:Label>
+                        <asp:Label ID="lblDIAddress2" runat="server" Text='<%# Eval("devotee_address2") %>'></asp:Label><br />
+                        <asp:Label ID="lblDICity" runat="server" Text='<%# Eval("devotee_city") %>'></asp:Label>&#44;
+                        <asp:Label ID="lblDIState" runat="server" Text='<%# Eval("devotee_state_cd") %>'></asp:Label>
+                        <asp:Label ID="lblDIZip" runat="server" Text='<%# Eval("devotee_zip_cd") %>'></asp:Label>
+                    </div>
+                </div>
+            </div>
+        </ItemTemplate>
+    </asp:FormView>
+
+    <asp:ValidationSummary ID="ValidationSummary1" runat="server" HeaderText="Please fix the following errors:" />
+    <asp:Label ID="lblErrorCC" runat="server" Visible="False" Text="For Credit Card, Card Type & Confirmation Number are required." />
+    <asp:Label ID="lblErrorCheck" runat="server" Visible="False" Text="For Checks, Check Number is required." />
+    <asp:Label ID="lblPrinterMsg" runat="server" Visible="False" />
+    <asp:Label ID="lblAuthorizationError" runat="server" Visible="False" />
+    <br />
+    <div class="reqfrmDetail">
+        <div class="reqfrmDetailBlock clear">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblServiceLocation" runat="server" Text="Service Location" SkinID="frmLabel" />
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:RadioButtonList ID="rdlServiceLocation" runat="server" class="rdl-service-location" AutoPostBack="false" DataTextField="Service_type_description" DataValueField="Service_Type_ID" OnDataBound="serviceLocation_DataBound" RepeatLayout="UnorderedList" TextAlign="Right" Width="350" />
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblServiceName" runat="server" Text="Service Location" SkinID="frmLabel" />
+            </div>
+            <div class="reqfrmDetailRight">
+                <span class="span-service">
+                    <input id="hdnServiceFee" type="hidden" runat="server" class="hdn-service-fee" />
+                    <asp:DropDownList ID="ddlService" runat="server"
+                        DataTextField="ServiceDescription" DataValueField="Service_ID"
+                        EnableViewState="False" Class="ddl-service">
+                    </asp:DropDownList>
+                </span>
+                <input id="hdnServiceId" type="hidden" runat="server" value="0" class="hdn-service-id" />
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblServiceFee" runat="server" Text="Service Fee" SkinID="frmLabel" />
+                <asp:RequiredFieldValidator ID="RFV1" runat="server"
+                    ErrorMessage="Fee Paid required" ControlToValidate="txtPaidFee" Display="Dynamic">*</asp:RequiredFieldValidator>
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:TextBox ID="txtPaidFee" runat="server" Class="txtPaidFee"></asp:TextBox>
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="Label1" runat="server" Text="Service Date" SkinID="frmLabel" />
+                <asp:RequiredFieldValidator ID="RFV2" runat="server"
+                    ControlToValidate="txtServiceDate" ErrorMessage="Select Service Date"
+                    Display="Dynamic">*</asp:RequiredFieldValidator>
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:TextBox ID="txtServiceDate" runat="server"></asp:TextBox>
+                <asp:CalendarExtender ID="CalendarExtender1" runat="server" Enabled="True" TargetControlID="txtServiceDate">
+                </asp:CalendarExtender>
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblPaymentType" runat="server" Text="Payment Type" SkinID="frmLabel" />
+                <asp:RequiredFieldValidator ID="RFV3" runat="server"
+                    ControlToValidate="rdlPaymentType" ErrorMessage="Select Payment Type"
+                    Display="Dynamic">*</asp:RequiredFieldValidator>
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:RadioButtonList ID="rdlPaymentType" runat="server" AutoPostBack="false" class="rdl-payment-type"
+                    DataTextField="Payment_type_code"
+                    DataValueField="Payment_type_ID" RepeatDirection="Horizontal">
+                </asp:RadioButtonList>
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear tr-check">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblCheckNumber" runat="server" Text="Check Number" SkinID="frmLabel" />
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:TextBox ID="txtCheckNumber" runat="server" class="tr-check"></asp:TextBox>
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear tr-credit">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblCCType" runat="server" Text="Credit Card Type" SkinID="frmLabel" />
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:RadioButtonList ID="rdlCCType" runat="server"
+                    DataTextField="Credit_card_type"
+                    DataValueField="Credit_card_type_id" RepeatDirection="Horizontal" AutoPostBack="True">
+                </asp:RadioButtonList>
+                <asp:PopupControlExtender ID="rdlCCType_PopupControlExtender" runat="server" DynamicServicePath="" Enabled="True" ExtenderControlID="" PopupControlID="pnlCCSwipe" TargetControlID="rdlCCType">
+                </asp:PopupControlExtender>
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear tr-credit">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblCardHolderName" runat="server" Text="Card Holder Name" SkinID="frmLabel" />
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:TextBox ID="txtCardHolderName" runat="server"></asp:TextBox>
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear tr-credit">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblCardNumber" runat="server" Text="Card Number" SkinID="frmLabel" />
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:TextBox ID="txtCardNumber" runat="server"></asp:TextBox>
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear tr-credit">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblCardExpDate" runat="server" Text="Card Exp Date" SkinID="frmLabel" />
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:TextBox ID="txtCardExpDate" runat="server"></asp:TextBox>
+            </div>
+        </div>
+        <div class="reqfrmDetailBlock clear tr-credit">
+            <div class="reqfrmDetailLeft">
+                <asp:Label ID="lblCVVNumber" runat="server" Text="Card CVV Number" SkinID="frmLabel" />
+            </div>
+            <div class="reqfrmDetailRight">
+                <asp:TextBox ID="txtCardCVVNumber" runat="server"></asp:TextBox>
+            </div>
+        </div>
+    </div>
+    <br />
+    <asp:Panel ID="pnlCCSwipe" runat="server" BackColor="#FFFF99" CssClass="CCPanel">
+        <p>
+            <asp:Label ID="lblmdl" runat="server" Text="Swipe Credit Card:" />
+            <asp:TextBox ID="txtCCSwipe" runat="server" OnTextChanged="txtCCSwipe_TextChanged" />
+        </p>
+    </asp:Panel>
+    <asp:RoundedCornersExtender ID="pnlCCSwipe_RoundedCornersExtender" runat="server" BorderColor="Chocolate" Color="Chocolate" Enabled="True" Radius="15" TargetControlID="pnlCCSwipe">
+    </asp:RoundedCornersExtender>
+    <br />
+    <table id="Table1">
+        <tr>
+            <td>
+                <asp:Button ID="cmdAddService" runat="server" Text="Add Service" class="btn-submit" OnClick="cmdAddService_Click" CssClass="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" /></td>
+        </tr>
+    </table>
+    <asp:SqlDataSource ID="SDS_DevoteeInfo" runat="server"
+        ConnectionString="<%$ ConnectionStrings:ApplicationServices %>"
+        SelectCommand="SELECT Devotee.Devotee_Title, Devotee.Devotee_M_Name, Devotee.Devotee_First_Name, Devotee.Devotee_Last_Name, Devotee_Contact_Info.Devotee_Contact_Info_ID, Devotee_Contact_Info.Devotee_Phone1, Devotee_Contact_Info.Devotee_Phone2, Devotee_Contact_Info.Devotee_Email1, Devotee_Contact_Info.Devotee_Email2, Devotee_Mail_Address.Devotee_Mail_Address_ID, Devotee_Mail_Address.Devotee_Address1, Devotee_Mail_Address.Devotee_Address2, Devotee_Mail_Address.Devotee_City, Devotee_Mail_Address.Devotee_State_CD, Devotee_Mail_Address.Devotee_Zip_CD FROM Devotee INNER JOIN Devotee_Contact_Info ON Devotee.Devotee_ID = Devotee_Contact_Info.Devotee_ID INNER JOIN Devotee_Mail_Address ON Devotee_Contact_Info.Devotee_ID = Devotee_Mail_Address.Devotee_ID WHERE (Devotee.Devotee_ID = @id)">
+        <SelectParameters>
+            <asp:QueryStringParameter Name="id" QueryStringField="devoteeId" />
+        </SelectParameters>
+    </asp:SqlDataSource>
+</asp:Content>
+

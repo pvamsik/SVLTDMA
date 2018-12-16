@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<response>
+	<ResponseCode>1</ResponseCode>
+	<Messages>
+		<Message>
+		<Code>1</Code>
+		<Description><![CDATA[This transaction has been approved.]]></Description>
+		</Message>
+	</Messages>
+	<AuthCode><![CDATA[000000]]></AuthCode>
+	<AVSResultCode>P</AVSResultCode>
+	<CVVResultCode></CVVResultCode>
+	<TransID>0</TransID>
+	<RefTransID></RefTransID>
+	<TransHash>37921EC5F7B1582347A8FE2A4A91349E</TransHash>
+	<TestMode>1</TestMode>
+	<UserRef></UserRef>
+	<AccountNumber>XXXX0027</AccountNumber>
+	<AccountType>Visa</AccountType>
+</response>

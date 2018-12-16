@@ -1,0 +1,301 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" ViewStateMode="Enabled" EnableViewState="true" CodeFile="quickService.ascx.cs" Inherits="Controls_quickService" %>
+
+<asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server"></asp:ScriptManagerProxy>
+<script>
+    $(function () {
+        var currentDate = new Date();
+        $(".datepicker").datepicker({
+            showOtherMonths: true,
+            selectOtherMonths: true
+        });
+        $(".datepicker").datepicker("setDate", currentDate);
+    });
+</script>
+<style type="text/css">
+    /*td[id^="ContentPlaceHolder1_quickService1_lvServices_ctrl"]
+    {
+        max-width: 225px;
+        min-width: 225px;
+        min-height: 75px !important;
+    }
+    */
+    .item-td {
+        background:#FFFBD6;
+        text-align:center;
+        vertical-align:middle;
+        color:#333;
+        width:200px;
+    }
+    .selected-item-td {
+        background:#FFCC66;
+        text-align:center;
+        vertical-align:middle;
+        color:#000080;
+        width:200px;
+    }
+    .lnkbutton {
+        padding:10px;
+        text-decoration:none;
+    }
+        .lnkbutton:hover {
+            border:1px solid #fbcb09;background:#fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x;font-weight:bold;color:#c77405;
+        }
+    .span-selected {
+        padding:10px;
+        width: 80%;
+        height: 95%;
+        text-decoration:none;
+        border:1px solid #fbcb09;background:#fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x;font-weight:bold;color:#c77405;
+    }
+</style>
+
+<asp:ValidationSummary ID="ValidationSummary1" runat="server" HeaderText="Please fix the following errors:" />
+<p>
+    <asp:Label ID="lblErrorCC" runat="server" Visible="False" Text="For Credit Card, Card Type & Confirmation Number are required." />
+    <asp:Label ID="lblErrorCheck" runat="server" Visible="False" Text="For Checks, Check Number is required." />
+    <asp:Label ID="lblPrinterMsg" runat="server" Visible="False" />
+    <asp:Label ID="lblAuthorizationError" runat="server" Visible="False" />
+    <asp:Label ID="lblCCReader" runat="server" Visible="False" />
+</p>
+<asp:UpdatePanel ID="UP_AddService" runat="server">
+    <ContentTemplate>
+        <p>
+            <asp:Label ID="Label1" runat="server" Text="Service Date" SkinID="frmLabel" />
+            <asp:TextBox ID="txtServiceDate" runat="server" class="datepicker"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="RFV2" runat="server"
+                ControlToValidate="txtServiceDate" ErrorMessage="Please select a Service Date"
+                Display="Dynamic">*</asp:RequiredFieldValidator>
+        </p>
+        <p>
+            <asp:Label ID="Label2" runat="server" Text="Service Location" SkinID="frmLabel" />
+            <asp:RadioButtonList runat="server" ID="rblLocation" AutoPostBack="True"
+                 DataTextField="Service_type_description" DataValueField="Service_Type_ID"
+                RepeatLayout="Flow" RepeatDirection="Horizontal" OnSelectedIndexChanged="rblLocation_SelectedIndexChanged" >
+            </asp:RadioButtonList>
+        <p><asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                 <ContentTemplate>
+            <asp:Label ID="Label3" runat="server" SkinID="frmLabel" Text="Service" />
+            <asp:Label ID="lblSelectedService" runat="server" Text="" Visible="false"></asp:Label>
+            <asp:Label ID="lblSelectedServiceName" runat="server" Text=""></asp:Label>
+            $<asp:Label ID="lblSelectedServiceFee" runat="server" Text=""></asp:Label>
+            
+            <%--DataSourceID="SDS_Services" --%>
+            <asp:ListView ID="lvServices" runat="server" DataKeyNames="Service_ID" DataSourceID="SDS_Services" 
+                EnablePersistedSelection="true" GroupItemCount="3" OnSelectedIndexChanged="lvServices_SelectedIndexChanged"
+                EnableViewState="true" SelectedIndex="-1" OnDataBound="lvServices_DataBound" >
+                <ItemTemplate>
+                    <td id="Td1" runat="server" class="item-td">    
+                        <asp:LinkButton ID="lnkbtnService" runat="server" CssClass="lnkbutton ui-button ui-state-default ui-corner-all ui-button-text-only" Width="88%" Height="95%" CommandName="Select" CausesValidation="false"> 
+                            <%# Eval("Service_Name") %> <br /> <%# Eval("Service_Fee", "{0:c}") %>
+                        </asp:LinkButton>
+                        <asp:Label ID="lblServiceID" runat="server" Text='<%# Eval("Service_ID") %>' Visible="false" />
+                        <asp:Label ID="lblServiceName" runat="server" Text='<%# Eval("Service_Name") %>'  Visible="false"/>
+                        <asp:Label ID="lblServiceFee" runat="server" Text='<%# Eval("Service_Fee", "{0:c}") %>'  Visible="false"/>
+                        <%--<br />
+                        <asp:Button ID="selectedService1" runat="server" Text='Click here to select'
+                            CssClass="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"
+                            CommandName="Select" CausesValidation="false" />--%>
+                    </td>
+                </ItemTemplate>
+                <SelectedItemTemplate>
+                    <td id="Td1" runat="server" class="selected-item-td">
+                        <span id="sp1" runat="server" class="span-selected ui-button ui-corner-all clearfix">
+                        <asp:Label ID="lblServiceID" runat="server" Text='<%# Eval("Service_ID") %>' Visible="false" />
+                        <asp:Label ID="lblServiceName" runat="server" Text='<%# Eval("Service_Name") %>' />
+                        <br />
+                        <asp:Label ID="lblServiceFee" runat="server" Text='<%# Eval("Service_Fee", "{0:c}") %>' />
+                        </span>
+                    </td>
+                </SelectedItemTemplate>
+                <EmptyDataTemplate>
+                    <table id="Table1" runat="server" style="background-color: #FFFFFF; border-collapse: collapse; border-color: #999999; border-style: none; border-width: 0px;">
+                        <tr>
+                            <td>No Services found for the selected Date</td>
+                        </tr>
+                    </table>
+                </EmptyDataTemplate>
+                <EmptyItemTemplate>
+                    <td id="Td2" runat="server" />
+                </EmptyItemTemplate>
+                <GroupTemplate>
+                    <tr id="itemPlaceholderContainer" runat="server">
+                        <td id="itemPlaceholder" runat="server"></td>
+                    </tr>
+                </GroupTemplate>
+                <LayoutTemplate>
+                    <table id="Table2" runat="server">
+                        <tr id="Tr1" runat="server">
+                            <td id="Td3" runat="server">
+                                <table id="groupPlaceholderContainer" runat="server" border="0" style="background-color: #FFFFFF; border-collapse: collapse; border-color: #999999; border-style: none; border-width: 1px; font-family: Verdana, Arial, Helvetica, sans-serif;">
+                                    <tr id="groupPlaceholder" runat="server">
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr id="Tr2" runat="server">
+                            <td id="Td4" runat="server" style="text-align: center; background-color: #FFCC66; font-family: Verdana, Arial, Helvetica, sans-serif; color: #333333;">
+                                <asp:DataPager ID="DataPager1" runat="server" PageSize="15">
+                                    <Fields>
+                                        <asp:NextPreviousPagerField ButtonType="Button" ShowFirstPageButton="True" ShowNextPageButton="False" ShowPreviousPageButton="False" />
+                                        <asp:NumericPagerField />
+                                        <asp:NextPreviousPagerField ButtonType="Button" ShowLastPageButton="True" ShowNextPageButton="False" ShowPreviousPageButton="False" />
+                                    </Fields>
+                                </asp:DataPager>
+                            </td>
+                        </tr>
+                    </table>
+                </LayoutTemplate>
+            </asp:ListView>
+                </ContentTemplate>
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="rblLocation" EventName="SelectedIndexChanged" />
+                </Triggers>
+            </asp:UpdatePanel>
+            <p>
+            </p>
+            <p>
+                <asp:Label ID="Label4" runat="server" SkinID="frmLabel" Text="Service Fee" />
+                <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="txtServiceFee" Display="Dynamic" ErrorMessage="Select Payment Type">*</asp:RequiredFieldValidator>
+                $<asp:TextBox ID="txtServiceFee" runat="server"></asp:TextBox>
+                <asp:CustomValidator ID="feeValidator" runat="server" ControlToValidate="txtServiceFee" EnableViewState="true" ErrorMessage="Fee must be greater than or equal to suggested fee" OnServerValidate="feeValidator_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+            </p>
+            <p>
+                <asp:Label ID="lblPaymentType" runat="server" SkinID="frmLabel" Text="Payment Type" />
+                <asp:RequiredFieldValidator ID="RFV3" runat="server" ControlToValidate="rdlPaymentType" Display="Dynamic" ErrorMessage="Select Payment Type">*</asp:RequiredFieldValidator>
+                <asp:RadioButtonList ID="rdlPaymentType" runat="server" AutoPostBack="true" class="rdl-payment-type" DataTextField="Payment_type_description" DataValueField="Payment_type_ID" OnSelectedIndexChanged="rdlPaymentType_SelectedIndexChanged" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                </asp:RadioButtonList>
+            </p>
+            <asp:Panel ID="pnlCheck" runat="server" Visible="false">
+                <p>
+                    <div class="reqfrmDetailLeft">
+                        <asp:Label ID="lblCheckNumber" runat="server" SkinID="frmLabel" Text="Check Number" />
+                    </div>
+                    <div class="reqfrmDetailRight">
+                        <asp:CustomValidator ID="chkValidator" runat="server" ControlToValidate="txtCheckNumber" EnableViewState="true" ErrorMessage="Please provide Check Number, if payment type is Check" OnServerValidate="chkValidator_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+                        <asp:TextBox ID="txtCheckNumber" runat="server"></asp:TextBox>
+                    </div>
+                </p>
+            </asp:Panel>
+            <asp:Panel ID="pnlCard" runat="server" Visible="false">
+                <p>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        <div class="reqfrmDetailLeft">
+                            <asp:Label ID="lblCCType" runat="server" SkinID="frmLabel" Text="Credit Card Type" />
+                        </div>
+                        <asp:CustomValidator ID="cvCCTypeValidator" runat="server" ControlToValidate="rdlCCType" EnableViewState="true" ErrorMessage="Please select a Card Type" OnServerValidate="cvCCTypeValidator_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+                        <div class="reqfrmDetailRight">
+                            <asp:RadioButtonList ID="rdlCCType" runat="server" AutoPostBack="true" DataTextField="Credit_card_type_description" DataValueField="Credit_card_type_id" OnSelectedIndexChanged="rdlCCType_SelectedIndexChanged" RepeatDirection="Horizontal">
+                            </asp:RadioButtonList>
+                        </div>
+                    </div>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        <p>
+                            &nbsp;</p>
+                    </div>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        Option 1: Swipe Credit Card below in Swipe Credit Card field to populate the Case Information in Option 2<br />
+                        <p>
+                            <asp:Label ID="lblmdl" runat="server" SkinID="frmLabel" Text="Swipe Credit Card:" />
+                            <asp:TextBox ID="txtCCSwipe" runat="server" AutoPostBack="true" OnTextChanged="txtCCSwipe_TextChanged" />
+                        </p>
+                    </div>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        or<br />
+                    </div>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        Option 2: Manually Enter the Card Information<br />
+                        <div class="reqfrmDetailLeft">
+                            <asp:Label ID="lblCardHolderName" runat="server" SkinID="frmLabel" Text="Card Holder Name" />
+                        </div>
+                        <asp:CustomValidator ID="cvCardHolderName" runat="server" ControlToValidate="txtCardHolderName" EnableViewState="true" ErrorMessage="Please enter Card Holder Name" OnServerValidate="cvCardHolderName_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+                        <div class="reqfrmDetailRight">
+                            <asp:TextBox ID="txtCardHolderName" runat="server"></asp:TextBox>
+                        </div>
+                    </div>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        <div class="reqfrmDetailLeft">
+                            <asp:Label ID="lblCardNumber" runat="server" SkinID="frmLabel" Text="Card Number" />
+                        </div>
+                        <asp:CustomValidator ID="cvCardNumber" runat="server" ControlToValidate="txtCardNumber" EnableViewState="true" ErrorMessage="Please enter Card Number" OnServerValidate="cvCardNumber_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+                        <div class="reqfrmDetailRight">
+                            <asp:TextBox ID="txtCardNumber" runat="server"></asp:TextBox>
+                        </div>
+                    </div>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        <div class="reqfrmDetailLeft">
+                            <asp:Label ID="lblCardExpDate" runat="server" SkinID="frmLabel" Text="Card Exp Date" />
+                        </div>
+                        <div class="reqfrmDetailRight">
+                            <asp:DropDownList ID="ddlCCExpMonth" runat="server">
+                                <asp:ListItem Value="01">January</asp:ListItem>
+                                <asp:ListItem Value="02">February</asp:ListItem>
+                                <asp:ListItem Value="03">March</asp:ListItem>
+                                <asp:ListItem Value="04">April</asp:ListItem>
+                                <asp:ListItem Value="05">May</asp:ListItem>
+                                <asp:ListItem Value="06">June</asp:ListItem>
+                                <asp:ListItem Value="07">July</asp:ListItem>
+                                <asp:ListItem Value="08">August</asp:ListItem>
+                                <asp:ListItem Value="09">September</asp:ListItem>
+                                <asp:ListItem Value="10">October</asp:ListItem>
+                                <asp:ListItem Value="11">November</asp:ListItem>
+                                <asp:ListItem Value="12">December</asp:ListItem>
+                            </asp:DropDownList>
+                            <asp:DropDownList ID="ddlCCExpYear" runat="server">
+                                <asp:ListItem Value="14">2014</asp:ListItem>
+                                <asp:ListItem Value="15">2015</asp:ListItem>
+                                <asp:ListItem Value="16">2016</asp:ListItem>
+                                <asp:ListItem Value="17">2017</asp:ListItem>
+                                <asp:ListItem Value="18">2018</asp:ListItem>
+                                <asp:ListItem Value="19">2019</asp:ListItem>
+                                <asp:ListItem Value="20">2020</asp:ListItem>
+                                <asp:ListItem Value="21">2021</asp:ListItem>
+                                <asp:ListItem Value="22">2022</asp:ListItem>
+                                <asp:ListItem Value="23">2023</asp:ListItem>
+                            </asp:DropDownList>
+                            <asp:TextBox ID="txtCardExpDate" runat="server" Visible="false"></asp:TextBox>
+                        </div>
+                    </div>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        <p>
+                            &nbsp;</p>
+                    </div>
+                    <div class="reqfrmDetailBlock clear tr-credit">
+                        <div class="reqfrmDetailLeft">
+                            <asp:Label ID="lblCVVNumber" runat="server" SkinID="frmLabel" Text="Card CVV Number" />
+                        </div>
+                        <asp:CustomValidator ID="cvCVVValidator" runat="server" ControlToValidate="txtCardCVVNumber" EnableViewState="true" ErrorMessage="Please enter Card CVV Number" OnServerValidate="cvCVVValidator_ServerValidate" ValidateEmptyText="true">*</asp:CustomValidator>
+                        <div class="reqfrmDetailRight">
+                            <asp:TextBox ID="txtCardCVVNumber" runat="server"></asp:TextBox>
+                        </div>
+                    </div>
+                    <p>
+                    </p>
+                </p>
+            </asp:Panel>
+            <br />
+            <p>
+            </p>
+            <p>
+            </p>
+            <p>
+            </p>
+        </p>
+        </ContentTemplate>
+    <Triggers>
+        <asp:AsyncPostBackTrigger ControlID="rblLocation" EventName="SelectedIndexChanged" />
+    </Triggers>
+</asp:UpdatePanel>
+<p>
+    <asp:Button ID="btnAddService" runat="server" Text="Finish" CausesValidation="true" 
+        CssClass="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" OnClick="btnAddService_Click" />
+</p>
+<asp:SqlDataSource ID="SDS_ServiceLocation" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" 
+    SelectCommand="GetActiveServiceTypes" SelectCommandType="StoredProcedure"></asp:SqlDataSource>
+<asp:SqlDataSource ID="SDS_Services" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>"
+    SelectCommand="getServicesByServiceType" SelectCommandType="StoredProcedure">
+    <SelectParameters>
+        <asp:ControlParameter ControlID="rblLocation" DefaultValue="1" Name="ServiceTypeId" PropertyName="SelectedValue" Type="Int32" />
+    </SelectParameters>
+</asp:SqlDataSource>
+<asp:SqlDataSource ID="SDS_CardType" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" 
+    SelectCommand="SELECT [Credit_card_type_id], [Credit_card_type_description], [ShowDefault] FROM [Credit_Card_Type]"></asp:SqlDataSource>

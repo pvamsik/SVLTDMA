@@ -1,0 +1,89 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "SVLTDMA", "SVLTDMA\", "{17B8F239-0229-4C82-9E64-5B21F04B1254}"
+	ProjectSection(WebsiteProperties) = preProject
+		SccProjectName = "SAK"
+		SccAuxPath = "SAK"
+		SccLocalPath = "SAK"
+		SccProvider = "SAK"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6.1"
+		ProjectReferences = "{de70a76f-b371-485a-a1bb-a2cac56e1651}|CommonDTO.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/SVLTDMA"
+		Debug.AspNetCompiler.PhysicalPath = "SVLTDMA\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\SVLTDMA\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/SVLTDMA"
+		Release.AspNetCompiler.PhysicalPath = "SVLTDMA\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\SVLTDMA\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "62177"
+		SlnRelativePath = "SVLTDMA\"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonDTO", "CommonDTO\CommonDTO.csproj", "{DE70A76F-B371-485A-A1BB-A2CAC56E1651}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManageTemple", "ManageTemple\ManageTemple.csproj", "{9EC3EC18-BB98-4EBF-98CE-9419EF873C0B}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "KIOSK(3)", "KIOSK\", "{CC9EB491-021C-4FD9-84F7-3F221915FFA9}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6.1"
+		ProjectReferences = "{de70a76f-b371-485a-a1bb-a2cac56e1651}|CommonDTO.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_62178"
+		Debug.AspNetCompiler.PhysicalPath = "KIOSK\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62178\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_62178"
+		Release.AspNetCompiler.PhysicalPath = "KIOSK\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62178\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "62178"
+		SlnRelativePath = "KIOSK\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17B8F239-0229-4C82-9E64-5B21F04B1254}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17B8F239-0229-4C82-9E64-5B21F04B1254}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17B8F239-0229-4C82-9E64-5B21F04B1254}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{17B8F239-0229-4C82-9E64-5B21F04B1254}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{DE70A76F-B371-485A-A1BB-A2CAC56E1651}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE70A76F-B371-485A-A1BB-A2CAC56E1651}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE70A76F-B371-485A-A1BB-A2CAC56E1651}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE70A76F-B371-485A-A1BB-A2CAC56E1651}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EC3EC18-BB98-4EBF-98CE-9419EF873C0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EC3EC18-BB98-4EBF-98CE-9419EF873C0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EC3EC18-BB98-4EBF-98CE-9419EF873C0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EC3EC18-BB98-4EBF-98CE-9419EF873C0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC9EB491-021C-4FD9-84F7-3F221915FFA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC9EB491-021C-4FD9-84F7-3F221915FFA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC9EB491-021C-4FD9-84F7-3F221915FFA9}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC9EB491-021C-4FD9-84F7-3F221915FFA9}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.0\lib\NET35;packages\Unity.Interception.2.1.505.0\lib\NET35
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Data.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.ExceptionHandling.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.ExceptionHandling.Logging.6.0.1304.0\lib\NET45
+		SolutionGuid = {96D61F96-3469-478D-A847-143A587E84E3}
+	EndGlobalSection
+EndGlobal

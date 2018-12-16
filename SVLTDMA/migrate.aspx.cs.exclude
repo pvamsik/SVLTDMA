@@ -1,0 +1,158 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using CommonDTO;
+using System.Threading.Tasks;
+using CommonDTO.Entities;
+public partial class migrate : BasePage
+{
+    //public List<PaymentTypeDTO> PaymentTypes
+    //{
+    //    get
+    //    {
+    //        if (Application["paymentTypes"] != null)
+    //            return (List<PaymentTypeDTO>)Application["paymentTypes"];
+    //        else
+    //            return data.GetPaymentTypes();
+    //    }
+    //}
+    List<ServiceDTO> myServices;
+    List<PaymentTypeDTO> myPaymentTypes;
+    List<DevoteeDTO> myDevotees;
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        myServices = Services;
+        myPaymentTypes = PaymentTypes;
+        myDevotees = Devotees;
+    }
+    protected void btnMigration_Click(object sender, EventArgs e)
+    {
+        migrateData();
+    }
+    
+    public void migrateData()
+    {
+        using (oldOrderEntities migrationContext = new oldOrderEntities())
+        {
+            int i = 0;
+            List<Service_Requests> oldOrders = migrationContext.Service_Requests.ToList();
+            foreach (var oldOrder in oldOrders)
+            {
+                migrationMessages.Text += "<p>Processing Order: " + oldOrder.Service_Request_ID.ToString() + "</p>";
+                if (!string.IsNullOrEmpty(oldOrder.Devotee_ID.ToString()))
+                {
+                    try
+                    {
+                        //Create new Storage Order using EF
+                        Order o = new Order
+                        {
+                            orderGuid = Guid.NewGuid(),
+                            orderDate = oldOrder.Created_Date.ToString(),
+                            devoteeID = (int)oldOrder.Devotee_ID,
+                            MailAddressId = 0,
+                            paymentMethodName = myPaymentTypes.FirstOrDefault(x => x.Payment_type_ID == oldOrder.Payment_Type_ID).Payment_type_code,
+                            orderTotal = (decimal)oldOrder.Service_Fee_Paid,
+                            orderItemCount = 1,
+                            comment1 = string.IsNullOrEmpty(oldOrder.Comment1) ? "" : oldOrder.Comment1,
+                            comment2 = string.IsNullOrEmpty(oldOrder.Comment2) ? "" : oldOrder.Comment2,
+                            comment3 = string.IsNullOrEmpty(oldOrder.Comment3) ? "" : oldOrder.Comment3,
+                            orderCreatedBy = oldOrder.CreatedBy
+                        };
+
+                        //Get Devotee Information.
+                        DevoteeDTO di = myDevotees.FirstOrDefault(x => x.Devotee_ID == o.devoteeID.ToString()); //getDevotee(o.devoteeID.ToString()); //myDevotees.FirstOrDefault(x => x.Devotee_ID == o.devoteeID.ToString())
+                        o.cardName = di.Devotee_First_Name + " " + di.Devotee_Last_Name;
+
+                        if (oldOrder.Payment_Type_ID == 1 || oldOrder.Payment_Type_ID == 3)
+                        {
+                            List<Service_Requests_Transaction> oldOrderDetailsList = migrationContext.Service_Requests_Transaction
+                                                                               .Where(x => x.Service_Request_ID == oldOrder.Service_Request_ID).ToList();
+                            Service_Requests_Transaction oldOrderDetails = oldOrderDetailsList.LastOrDefault();
+
+                            //Populate Payment Type Specific Information
+                            switch (o.paymentMethodName)
+                            {
+                                case "CREDIT CARD":
+                                    o.cardNumberMasked = oldOrderDetails.CardNumber;
+                                    o.cardType = oldOrderDetails.Credit_Card_Type;
+                                    o.cardCVV2 = "";
+                                    o.cardExpirationMonth = oldOrderDetails.CardExpiration;
+                                    o.cardExpirationYear = oldOrderDetails.CardExpiration;
+                                    o.authorizationTransactionCode = oldOrderDetails.TransactionType;
+                                    o.authorizationTransactionId = oldOrderDetails.TransactionID;
+                                    break;
+                                case "CHECK":
+                                    o.checkDate = oldOrder.Check_Date;
+                                    o.checkNumber = oldOrder.Check_Number.ToString();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+
+                        OrderItem oi = new OrderItem
+                        {
+                            orderItemGuid = Guid.NewGuid(),
+                            OrderId = o.Id,
+                            serviceDate = oldOrder.Service_Date.ToShortDateString(),
+                            serviceId = oldOrder.Service_ID,
+                            serviceName = myServices.FirstOrDefault(x => x.Service_ID == oldOrder.Service_ID).Service_Name,
+                            quantity = 1,
+                            price = 1 * (decimal) oldOrder.Service_Fee_Paid,
+                            comments = "",
+                        };
+
+                        if (oldOrder.Status.Trim() == "Voided")
+                        {
+                            o.refundedAmount = (decimal)oldOrder.Service_Fee_Paid;
+                            o.orderStatus = "Cancelled";
+                            o.paymentStatus = "Refunded";
+                            o.refundTransactionCode = "";
+                            o.refundTransactionId = "";
+                            oi.itemStatus = "Refunded";
+                        }
+                        else
+                        {
+                            o.refundedAmount = 0;
+                            o.orderStatus = "Completed";
+                            o.paymentStatus = "Success";
+                            o.refundTransactionCode = "";
+                            o.refundTransactionId = "";
+                            oi.itemStatus = "Completed";
+                        }
+
+                        migrationContext.OrderItems.Add(oi);
+                        migrationContext.Orders.Add(o);
+                        i++;
+
+                        try
+                        {
+                            migrationContext.SaveChanges();
+                        }
+                        catch (Exception saveException)
+                        {
+                            migrationMessages.Text += "<p>" + saveException.Message.ToString() + "</p>";
+                            throw;
+                        }
+                        finally
+                        {
+                            i = 0;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        migrationMessages.Text += "<p>" + ex.Message.ToString() + "</p>";
+                    }
+                }
+            }
+        }
+    }
+
+    protected void migrationTimer_Tick(object sender, EventArgs e)
+    {
+        //migrationMessages.Text += "<p>Updating...</p>";
+    }
+}

@@ -1,0 +1,24 @@
+﻿<%@ Page Title="Migration Assistant" Async="true" Language="C#" MasterPageFile="~/admin.master" AutoEventWireup="true" CodeFile="migrate.aspx.cs" Inherits="migrate" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <asp:Button ID="btnMigration" runat="server" Text="Start Migration" OnClick="btnMigration_Click" CssClass="btn btn-primary" />
+    <asp:Timer ID="migrationTimer" runat="server" Interval="2500" OnTick="migrationTimer_Tick"></asp:Timer>
+    <div id="migrationStatus" runat="server" class="panel panel-info">
+        <div class="panel-heading">Migration Status</div>
+        <div class="panel-body">
+            <asp:UpdateProgress ID="migrationProgess" runat="server">
+                <ProgressTemplate>Updating...</ProgressTemplate>
+            </asp:UpdateProgress>
+            <asp:UpdatePanel ID="migrationPanel" runat="server">
+                <ContentTemplate>
+                    <asp:Literal runat="server" ID="migrationMessages"></asp:Literal>
+                </ContentTemplate>
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="migrationTimer" EventName="Tick" />
+                </Triggers>
+            </asp:UpdatePanel>
+        </div>
+    </div>
+</asp:Content>

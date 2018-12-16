@@ -1,0 +1,108 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="admin.master.cs" Inherits="admin" EnableTheming="true" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="<%$ AppSettings: institutionLogo %>" rel="shortcut icon" type="image/x-icon" />
+    <title runat="server"><%: Page.Title %>-
+        <asp:Literal ID="Literal1" runat="server" Text="<%$ AppSettings: institutionName%>" /></title>
+    <asp:PlaceHolder runat="server">
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/modernizr-2.5.3.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/jquery-3.1.1.min.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/jquery-ui-1.12.1.min.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/bootstrap.min.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/devotee.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/list.js") %>"></script>
+        <script type="text/javascript" src="<%: ResolveUrl("~/Scripts/list.pagination.js") %>"></script>
+    </asp:PlaceHolder>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <ajaxToolkit:ToolkitScriptManager ID="ScriptManager1" runat="server" LoadScriptsBeforeUI="false"></ajaxToolkit:ToolkitScriptManager>
+        <%--          <div class="container-fluid">
+          <div class="row header-gap">
+                <div class="col-md-2 text-right">
+                    <img runat="server" src="<%$ AppSettings: institutionLogo %>" alt="" class="logo" />
+                </div>
+                <div class="col-md-10">
+                    <hgroup>
+                        <h3>
+                            <asp:Label ID="lblSiteTitle" runat="server" Text="<%$ AppSettings: institutionName %>" /></h3>
+                        <h4>
+                            <asp:Label ID="lblSiteAddress" runat="server" Text="<%$ AppSettings: institutionAddress %>" /></h4>
+                    </hgroup>
+                </div>
+            </div>
+        </div>--%>
+        <nav class="navbar navbar-default">
+            <div class="col-lg-2 text-center">
+                <img runat="server" src="<%$ AppSettings: institutionLogo %>" />
+            </div>
+            <div class="col-lg-6 text-left">
+                <asp:Menu ID="cssmenu" Width="100%" CssClass="" runat="server" DataSourceID="SiteMapDataSource1" EnableViewState="False"
+                    Orientation="Horizontal" StaticDisplayLevels="2" StaticSubMenuIndent="10px" DynamicHorizontalOffset="2"
+                    SkipLinkText="" StaticEnableDefaultPopOutImage="False" IncludeStyleBlock="False" DynamicMenuStyle-CssClass="dropdown-menu">
+                    <StaticMenuStyle CssClass="nav navbar-nav" />
+                </asp:Menu>
+            </div>
+            <div class="col-lg-4 text-right">
+                <asp:LoginView ID="LoginView1" runat="server">
+                    <LoggedInTemplate>
+                        <a class="nav navbar-brand" href="<%= ResolveUrl("~/account/manageProfile.aspx") %>">Welcome
+                            <asp:Label ID="Fullname" runat="server"></asp:Label><asp:LoginName ID="LoginName" runat="server" />
+                            !
+                        </a>
+                        <asp:LoginStatus ID="LoginStatus1" runat="server" LogoutAction="Redirect" LogoutPageUrl="~/Account/Login.aspx"
+                            OnLoggingOut="LoginStatus1_LoggingOut" CssClass="nav navbar-brand" />
+                    </LoggedInTemplate>
+                </asp:LoginView>
+            </div>
+        </nav>
+        <article class="container-fluid">
+            <%--            <div class="col-lg-12">
+                <h2 class="text-center">Welcome to Online Temple Manager</h2>
+                <hr />
+            </div>--%>
+            <div class="col-lg-12">
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server"></asp:ContentPlaceHolder>
+            </div>
+        </article>
+        <footer class="text-center well-lg">
+            <hr />
+            <div class="col-lg-6">
+                &copy; 2013
+                <asp:Label ID="Label1" runat="server" Text="<%$ AppSettings: institutionName %>" />. All rights reserved.
+            </div>
+            <%--            <div class="col-lg-6">
+                <asp:Timer ID="Timer" runat="server" Interval="30000" OnTick="Timer_Tick"></asp:Timer>
+                <asp:UpdatePanel ID="UpdatePanel1" UpdateMode="Conditional" runat="server">
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="Timer" EventName="Tick" />
+                    </Triggers>
+                    <ContentTemplate>
+                        <div class="row">
+                            <div class="col-lg-5"></div>
+                            <div class="col-lg-1">
+                                <asp:ImageButton ID="printerStatus" runat="server" Height="40px" PostBackUrl="~/devotee/printerSettings.aspx" Width="40px" />
+                            </div>
+                            <div class="col-lg-1">
+                                <asp:Image ID="internetStatus" runat="server" Height="40px" Width="40px" />
+                            </div>
+                            <div class="col-lg-5">
+                                <span id="updatedTime" runat="server"></span>
+                            </div>
+                        </div>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+            </div>--%>
+        </footer>
+        <asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" />
+    </form>
+</body>
+</html>

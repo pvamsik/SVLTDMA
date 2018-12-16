@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+  <siteMapNode url="~/devotee/searchDevotee.aspx" title="Home" roles="Administrators,Managers,Volunteers" description="">
+    <siteMapNode url="~/devotee/createDevotee.aspx" roles="Administrators" title="Add Devotee"  description="">
+      <!--<siteMapNode url="~/devotee/quickService.aspx" title="Quick Service" description="Quick Service" />-->
+    </siteMapNode>
+    <siteMapNode url="~/devotee/printerSettings.aspx" roles="Administrators" title="Printer Settings"  description="" />
+    <siteMapNode url="~/manage/manage.aspx" roles="Administrators,Managers" title="Temple Management" description="">
+      <siteMapNode url="~/manage/AddService.aspx" roles="Administrators,Managers" title="Add Service"  description="" />
+      <siteMapNode url="~/manage/ServiceManager.aspx" roles="Administrators,Managers" title="Manage Services"  description="" />
+      <siteMapNode url="~/manage/manageUsers.aspx" roles="Administrators" title="Manage Users"  description="" />
+      <siteMapNode url="~/manage/createUser.aspx" roles="Administrators" title="Create Users"  description="" />
+      <siteMapNode url="~/manage/viewUserActivity.aspx" roles="Administrators" title="User Activity"  description="" />
+      <siteMapNode url="~/manage/sales.aspx" roles="Administrators" title="Daily Sales"  description="" />
+    </siteMapNode>
+    <siteMapNode url="~/Administration/manageSettings.aspx" roles="Administrators" title="Temple Administration"  description="" >
+      <siteMapNode url="~/Administration/siteSettings.aspx" roles="Administrators" title="Site Settings"  description="" />
+      <siteMapNode url="~/Administration/mailSettings.aspx" roles="Administrators" title="Mail Settings"  description="" />
+      <siteMapNode url="~/Administration/manageUsers.aspx" roles="Administrators" title="Manage Users"  description="" />
+      <siteMapNode url="~/Administration/createUser.aspx" roles="Administrators" title="Create Users"  description="" />
+      <siteMapNode url="~/Administration/paymentSettings.aspx" roles="Administrators" title="Payment Settings"  description="" />
+      <siteMapNode url="~/Administration/checkDepositManagement.aspx" roles="Administrators" title="Check Management"  description="" />
+      <siteMapNode url="~/Administration/sales.aspx" roles="Administrators" title="Daily Sales"  description="" />
+      <siteMapNode url="~/Administration/productSales.aspx" roles="Administrators" title="Product Sales"  description="" />
+    </siteMapNode>
+  </siteMapNode>
+</siteMap>

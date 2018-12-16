@@ -1,0 +1,24 @@
+﻿
+.reqfrmDetail
+{
+    margin: 0 0 20px 0;
+    padding: 0 5px;
+    width: 850px;
+}
+
+.reqfrmDetailLeft
+{
+    margin-top: 5px;
+    width: 150px;
+    float: left;
+}
+
+.reqfrmDetailRight
+{
+    float: left;
+}
+
+.clear
+{
+    clear: both;
+}

@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <title>{AppName}</title>
+    <style type="text/css">
+        .auto-style1
+        {
+            width: 400px;
+        }
+        .auto-style2
+        {
+            width: 200px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <header>
+            <div id="banner">
+                <img style="float: left; width: 90px; height: 90px; padding: 5px 10px;"
+                    src="http://svlotustemple.org/images/logo2.png"
+                    alt="Sri Venkateswara Lotus Temple" />
+                <hgroup style="float: left;">
+                    <h1 style="font-family: 'Old English Text MT', Calibri, Arial; font-size: 1.75em; padding-bottom: 5px;">
+                        <span id="Span1">Sri Venkateswara Lotus Temple</span></h1>
+                    <h2 style="font-size: 1em;">
+                        <span id="Span2">12501 Braddock Road, Fairfax, VA - 22030. Phone: 703-815-4850</span></h2>
+                </hgroup>
+            </div>
+            <div id="cleared"></div>
+        </header>
+        <div style="clear: both"></div>
+        <article>
+            <h3>Hello {UserName},</h3>
+            <h4>This is an email confirmation of your contribution to Sri Venkateswara Lotus Temple!</h4>
+            <table style="width:100%;">
+                <tr>
+                    <td class="auto-style1">{ServiceName}</td>
+                    <td class="auto-style2">{ServiceAmount}</td>
+                </tr>
+                <tr>
+                    <td class="auto-style2" style="padding-right: 10px"><strong>Total</strong></td>
+                    <td class="auto-style2"><strong>{ServiceAmount}</strong></td>
+                </tr>
+            </table>
+            <p>
+                Thank You<br />
+                Sri Venkateswara Lotus Temple<br />
+                Braddock Rd Fairfax, VA 22030
+            </p>
+        </article>
+        <footer>
+            <p>
+                &copy; 2013. All rights reserved.
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

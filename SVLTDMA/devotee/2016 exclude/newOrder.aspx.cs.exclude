@@ -1,0 +1,637 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using CommonDTO;
+using CommonDTO.Entities;
+using AuthorizeNet.Api.Controllers;
+using AuthorizeNet.Api.Contracts.V1;
+using AuthorizeNet.Api.Controllers.Bases;
+using CreditCardValidator;
+using System.Collections.Specialized;
+using System.Web.Script.Serialization;
+
+public partial class devotee_checkoutPage : BasePage
+{
+    public int rowIndex;
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        //If Devotee ID is not populated, automatically redirect to Search Devotee Page.
+        if (String.IsNullOrEmpty(Request.QueryString["devoteeId"]))
+            Response.Redirect("~/devotee/searchDevotee.aspx");
+
+        if (!IsPostBack)
+        {
+            int Devotee_ID = Utilities.GetInteger(Request.QueryString["devoteeid"]);
+
+            rblServiceType.DataSource = ServiceTypes;
+            rblServiceType.DataBind();
+
+            ServiceTypeDTO serviceTypeDto = ServiceTypes.Find(st => st.ShowDefault == true);
+            if (serviceTypeDto != null)
+                rblServiceType.SelectedIndex = rblServiceType.Items.IndexOf(rblServiceType.Items.FindByValue(serviceTypeDto.Service_Type_ID.ToString()));
+
+            lvServiceList.DataSource = ServiceList;
+            lvServiceList.DataBind();
+
+            //gvServiceList.DataSource = ServiceList;
+            //gvServiceList.DataBind();
+
+            shoppingCart sc = new shoppingCart();
+            cartCount.InnerText = sc.GetCartCount().ToString();
+        }
+        else
+        {
+            shoppingCart sc = new shoppingCart();
+            cartCount.InnerText = sc.GetCartCount().ToString();
+        }
+    }
+    protected void rblServiceType_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        int serviceTypeId = Convert.ToInt32(rblServiceType.SelectedValue);
+        //rowIndex = ServiceList.IndexOf(ServiceList.Find(st => st.ShowDefault == true));
+
+        //if (rowIndex < 0)
+        //    rowIndex = ServiceList.IndexOf(ServiceList.FirstOrDefault());
+
+        lvServiceList.DataSource = ServiceList.Where(st => st.Service_Type_ID == serviceTypeId);
+        lvServiceList.DataBind();
+
+        //gvServiceList.DataSource = ServiceList;
+        //gvServiceList.DataBind();
+
+    }
+    protected void service_Command(object sender, CommandEventArgs e)
+    {
+        LinkButton service = (LinkButton)sender;
+        using (shoppingCart usersShoppingCart = new shoppingCart())
+        {
+            usersShoppingCart.AddToCart(Convert.ToInt16(service.Attributes["data-service-id"]), txtServiceDate.Text);
+            cartCount.InnerText = usersShoppingCart.GetCartCount().ToString();
+        }
+        CartList.DataBind();
+    }
+    protected void btnEmptyCart_Click(object sender, EventArgs e)
+    {
+        shoppingCart usersShoppingCart = new shoppingCart();
+        usersShoppingCart.emptyCart();
+        CartList.DataBind();
+        cartCount.InnerText = usersShoppingCart.GetCartCount().ToString();
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsServiceSelection)]);
+    }
+    protected void CartList_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.Footer)
+        {
+            using (shoppingCart usersShoppingCart = new shoppingCart())
+            {
+                decimal cartTotal = 0;
+                cartTotal = usersShoppingCart.GetTotal();
+                if (cartTotal > 0)
+                {
+                    e.Row.Cells[1].Text = "Total";
+                    e.Row.Cells[6].Text = String.Format("{0:C}", cartTotal);
+                }
+            }
+        }
+    }
+    protected void btnResetPaymentForm_Click(object sender, EventArgs e)
+    {
+        txtCCReader.Text = "";
+        txtCCName.Text = "";
+        txtCCNumber.Text = "";
+        txtCCExpDate.Text = "";
+        txtCVV.Text = "";
+    }
+    protected void paymentType_Click(object sender, EventArgs e)
+    {
+        Button paymentType = (Button)sender;
+        Session["paymentMethodName"] = paymentType.Attributes["data-order-paymentType"];
+        switch (paymentType.Attributes["data-order-paymentType"])
+        {
+            case "CHECK":
+                kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsCheckPaymentInfo)]);
+                break;
+            case "CASH":
+                processPayment();
+                //kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsProcessingResults)]);
+                break;
+            case "CREDIT CARD":
+                kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsCCDetails)]);
+                break;
+            case "IN KIND":
+                processPayment();
+                //kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsProcessingResults)]);
+                break;
+            default:
+                break;
+        }
+    }
+    protected void btnContinue_Click(object sender, EventArgs e)
+    {
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[0]);
+    }
+    protected void btnCheckOut_Click(object sender, EventArgs e)
+    {
+        using (shoppingCart userShoppingCart = new shoppingCart())
+        {
+            if (userShoppingCart.GetCartCount() > 0)
+            {
+                kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsPaymentOption)]);
+            }
+        }
+    }
+    protected void btnContinueShopping_Click(object sender, EventArgs e)
+    {
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsServiceSelection)]);
+    }
+    protected void btnChangePaymentType_Click(object sender, EventArgs e)
+    {
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsPaymentOption)]);
+    }
+    protected void btnChkChangePaymentType_Click(object sender, EventArgs e)
+    {
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsPaymentOption)]);
+    }
+    protected void btnCCChangePaymentType_Click(object sender, EventArgs e)
+    {
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsPaymentOption)]);
+    }
+    protected void btnAIOChangePaymentType_Click(object sender, EventArgs e)
+    {
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsPaymentOption)]);
+    }
+    protected void btnGotoCart_Click(object sender, EventArgs e)
+    {
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsShoppingCart)]);
+    }
+    protected void btnGobacktoCart_Click(object sender, EventArgs e)
+    {
+        kioskOrder.MoveTo(kioskOrder.WizardSteps[kioskOrder.WizardSteps.IndexOf(wsShoppingCart)]);
+    }
+    protected void btnCCPaymentFormSubmit_Click(object sender, EventArgs e)
+    {
+        processPayment();
+    }
+    protected List<ServiceDTO> ServiceList
+    {
+        get
+        {
+            if (rblServiceType.SelectedItem == null)
+                return Services.FindAll(s => s.Service_Type_ID == ServiceTypes.FirstOrDefault().Service_Type_ID);
+            else
+                return Services.FindAll(s => s.Service_Type_ID.ToString() == rblServiceType.SelectedItem.Value);
+        }
+    }
+    protected void cmdCheckReset_Click(object sender, EventArgs e)
+    {
+
+    }
+    protected void cmdCheckSubmit_Click(object sender, EventArgs e)
+    {
+        processPayment();
+    }
+    private void processPayment()
+    {
+        string paymentMethodName = Session["paymentMethodName"].ToString();
+        shoppingCart sc = new shoppingCart();
+        string devoteeId = Request.QueryString["devoteeId"] == null ? "" : Request.QueryString["devoteeId"];
+        if (!(String.IsNullOrEmpty(paymentMethodName)) && !(String.IsNullOrEmpty(devoteeId)))
+        {
+            List<string> comments = new List<string>();
+            comments.Add(txtOrderComment1.Text);
+            comments.Add(txtOrderComment2.Text);
+            comments.Add(txtOrderComment3.Text);
+            var jsonSerialiser = new JavaScriptSerializer();
+            string JSONString = jsonSerialiser.Serialize(comments);
+
+            try
+            {
+                //Get Devotee Information.
+                devoteeInfo di = getDevotee(devoteeId);
+                try
+                {
+                    using (OrderEntities context = new OrderEntities())
+                    {
+                        using (var dbContextTransaction = context.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                //Create new Storage Order using EF
+                                Order o = new Order
+                                {
+                                    orderGuid = Guid.NewGuid(),
+                                    orderDate = DateTime.Today.ToShortDateString(),
+                                    devoteeID = int.Parse(devoteeId),
+                                    MailAddressId = 0,
+                                    paymentMethodName = paymentMethodName,
+                                    orderTotal = sc.GetTotal(),
+                                    orderItemCount = Convert.ToInt16(sc.GetCartCount()),
+                                    refundedAmount = 0,
+                                    comment1 = txtOrderComment1.Text,
+                                    comment2 = txtOrderComment2.Text,
+                                    comment3 = txtOrderComment3.Text,
+                                    orderCreatedBy = string.IsNullOrEmpty(Session["UserName"].ToString()) ? "Guest" : Session["UserName"].ToString()
+                                };
+                                o.checkDepositDate = "";
+                                o.checkDepositregisteredBy = "";
+                                o.refundTransactionId = "";
+                                o.refundTransactionCode = "";
+
+                                //Populate Payment Type Specific Information
+                                switch (paymentMethodName)
+                                {
+                                    case "CREDIT CARD":
+                                        //Prepare Credit Card Data
+                                        creditCardType CC = new creditCardType();
+                                        CC.cardNumber = txtCCNumber.Text.ToString();
+                                        CC.expirationDate = txtCCExpDate.Text.ToString();
+                                        CC.cardCode = txtCVV.Text.ToString();
+
+                                        //Process the Credit Card Payment with Authorize.Net
+                                        ANetResponse res = ccProcessor.chargeCard(sc, di, CC);
+
+                                        if (res.response.messages.resultCode == messageTypeEnum.Ok)
+                                        {
+                                            o.orderStatus = "Completed";
+                                            o.paymentStatus = "Success";
+                                            o.cardName = di.firstName;
+                                            o.cardNumberMasked = res.transResponse.accountNumber;
+                                            o.cardType = ccBrandName(CC.cardNumber);
+                                            o.cardCVV2 = CC.cardCode;
+                                            o.cardExpirationMonth = CC.expirationDate;
+                                            o.cardExpirationYear = CC.expirationDate;
+                                            o.authorizationTransactionCode = res.transResponse.authCode;
+                                            o.authorizationTransactionId = res.transResponse.transId;
+                                        }
+                                        else
+                                        {
+                                            o.orderStatus = "Pending";
+                                            o.paymentStatus = "Failed";
+                                        }
+                                        break;
+                                    case "CHECK":
+                                        o.orderStatus = "Completed";
+                                        o.paymentStatus = "Success";
+                                        o.checkDate = Convert.ToDateTime(txtCheckDate.Text);
+                                        o.checkNumber = txtCheckNumber.Text;
+                                        break;
+                                    default:
+                                        o.orderStatus = "Completed";
+                                        o.paymentStatus = "Success";
+                                        break;
+                                }
+
+                                var cartItems = sc.GetCartItems();
+
+                                foreach (var item in cartItems)
+                                {
+                                    OrderItem oi = new OrderItem
+                                    {
+                                        orderItemGuid = Guid.NewGuid(),
+                                        OrderId = o.Id,
+                                        serviceDate = item.orderDate,
+                                        serviceId = item.Service_ID,
+                                        serviceName = item.Service.Service_Name,
+                                        quantity = item.Quantity,
+                                        price = item.Quantity * item.Service.Service_Fee,
+                                        comments = item.comment,
+                                        itemStatus = "Completed"
+                                    };
+                                    context.OrderItems.Add(oi);
+                                }
+
+                                context.Orders.Add(o);
+                                context.SaveChanges();
+                                dbContextTransaction.Commit();
+
+                                sc.emptyCart();
+                                Response.Redirect(string.Format("~/devotee/orderDetails.aspx?devoteeId={0}&orderId={1}", o.devoteeID, o.Id));
+
+                            }
+                            catch (Exception ex)
+                            {
+                                errorMessage.InnerHtml = "<p class='text-danger'>" + ex.Message.ToString() + "</p>";
+                                dbContextTransaction.Rollback();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex1)
+                {
+                    errorMessage.InnerHtml = "<p class='text-danger'>" + ex1.Message.ToString() + "</p>";
+                }
+
+            }
+            catch (Exception ex2)
+            {
+                errorMessage.InnerHtml = "<p class='text-danger'>" + ex2.Message.ToString() + "</p>";
+            }
+        }
+
+    }
+    //private bool storeOrder(string paymentMethodName, string devoteeId, devoteeInfo di, shoppingCart sc, ANetResponse res)
+    //{
+    //    bool storageResult = false;
+    //    //Prepare Credit Card Data
+    //    creditCardType CC = new creditCardType();
+    //    CC.cardNumber = txtCCNumber.Text.ToString();
+    //    CC.expirationDate = txtCCExpDate.Text.ToString();
+    //    CC.cardCode = txtCVV.Text.ToString();
+
+    //    try
+    //    {
+    //        using (OrderEntities context = new OrderEntities())
+    //        {
+    //            using (var dbContextTransaction = context.Database.BeginTransaction())
+    //            {
+    //                try
+    //                {
+    //                    //Create new Storage Order using EF
+    //                    Order o = new Order
+    //                    {
+    //                        orderGuid = Guid.NewGuid(),
+    //                        orderDate = new DateTime().ToShortDateString(),
+    //                        devoteeID = int.Parse(devoteeId),
+    //                        MailAddressId = 0,
+    //                        orderStatus = "Completed",
+    //                        paymentStatus = "Success",
+    //                        paymentMethodName = paymentMethodName,
+    //                        orderTotal = sc.GetTotal(),
+    //                        refundedAmount = 0,
+    //                        authorizationTransactionCode = res.transResponse.authCode,
+    //                        authorizationTransactionId = res.transResponse.transId,
+    //                        orderCreatedBy = string.IsNullOrEmpty(Session["UserName"].ToString()) ? "Guest" : Session["UserName"].ToString()
+    //                    };
+
+    //                    //Populate Payment Type Specific Information
+    //                    switch (paymentMethodName)
+    //                    {
+    //                        case "CREDIT CARD":
+    //                            o.cardName = di.firstName;
+    //                            o.cardNumberMasked = res.transResponse.accountNumber;
+    //                            o.cardType = ccBrandName(CC.cardNumber);
+    //                            o.cardCVV2 = CC.cardCode;
+    //                            o.cardExpirationMonth = CC.expirationDate;
+    //                            o.cardExpirationYear = CC.expirationDate;
+    //                            break;
+    //                        case "CHECK":
+    //                            o.checkDate = Convert.ToDateTime(txtCheckDate.Text);
+    //                            o.checkNumber = txtCheckNumber.Text;
+    //                            break;
+    //                        default:
+    //                            break;
+    //                    }
+
+    //                    var cartItems = sc.GetCartItems();
+
+    //                    foreach (var item in cartItems)
+    //                    {
+    //                        OrderItem oi = new OrderItem
+    //                        {
+    //                            orderItemGuid = Guid.NewGuid(),
+    //                            OrderId = o.Id,
+    //                            serviceDate = item.orderDate,
+    //                            serviceId = item.Service_ID,
+    //                            quantity = item.Quantity,
+    //                            price = item.Quantity * item.Service.Service_Fee,
+    //                            comments = "",
+    //                            itemStatus = "Success"
+    //                        };
+    //                        context.OrderItems.Add(oi);
+    //                    }
+
+    //                    context.Orders.Add(o);
+    //                    context.SaveChanges();
+    //                    dbContextTransaction.Commit();
+    //                    storageResult = true;
+    //                }
+    //                catch (Exception ex)
+    //                {
+    //                    throw ex;
+    //                }
+    //                finally
+    //                {
+    //                    dbContextTransaction.Rollback();
+    //                }
+    //            }
+    //        }
+    //    }
+    //    catch(Exception ex1)
+    //    {
+    //        throw ex1;
+    //    }
+    //    return storageResult;
+    //}
+
+    //private void procesCardPayment()
+    //{
+    //    shoppingCart sc = new shoppingCart();
+    //    string paymentMethodName = Session["paymentMethodName"].ToString();
+    //    string devoteeId = Request.QueryString["devoteeId"] == null ? "" : Request.QueryString["devoteeId"];
+    //    devoteeInfo di = getDevotee(devoteeId);
+
+    //    //Process Credit Card Data
+    //    creditCardType CC = new creditCardType();
+    //    CC.cardNumber = txtCCNumber.Text.ToString();
+    //    CC.expirationDate = txtCCExpDate.Text.ToString();
+    //    CC.cardCode = txtCVV.Text.ToString();
+
+    //    //Initiate Credit Card Processing
+    //    try
+    //    {
+    //        ANetResponse res = ccProcessor.chargeCard(sc, di, CC);
+    //        if (res.response.messages.resultCode == messageTypeEnum.Ok)
+    //        {
+    //            using (OrderEntities context = new OrderEntities())
+    //            {
+    //                using (var dbContextTransaction = context.Database.BeginTransaction())
+    //                {
+    //                    try
+    //                    {
+    //                        Order o = new Order
+    //                        {
+    //                            orderGuid = Guid.NewGuid(),
+    //                            orderDate = new DateTime().ToShortDateString(),
+    //                            devoteeID = int.Parse(devoteeId),
+    //                            MailAddressId = 0,
+    //                            orderStatus = "Completed",
+    //                            paymentStatus = "Success",
+    //                            paymentMethodName = paymentMethodName,
+    //                            orderTotal = sc.GetTotal(),
+    //                            refundedAmount = 0,
+    //                            cardType = ccBrandName(CC.cardNumber),
+    //                            cardName = di.firstName,
+    //                            cardNumberMasked = res.transResponse.accountNumber,
+    //                            cardCVV2 = CC.cardCode,
+    //                            cardExpirationMonth = CC.expirationDate,
+    //                            cardExpirationYear = CC.expirationDate,
+    //                            authorizationTransactionCode = res.transResponse.authCode,
+    //                            authorizationTransactionId = res.transResponse.transId,
+    //                            orderCreatedBy = "Vamsi"
+    //                        };
+    //                        var cartItems = sc.GetCartItems();
+
+    //                        foreach (var item in cartItems)
+    //                        {
+    //                            OrderItem oi = new OrderItem
+    //                            {
+    //                                orderItemGuid = Guid.NewGuid(),
+    //                                OrderId = o.Id,
+    //                                serviceDate = item.orderDate,
+    //                                serviceId = item.Service_ID,
+    //                                quantity = item.Quantity,
+    //                                price = item.Quantity * item.Service.Service_Fee,
+    //                                comments = "",
+    //                                itemStatus = "Completed"
+    //                            };
+    //                            context.OrderItems.Add(oi);
+    //                        }
+
+    //                        context.Orders.Add(o);
+    //                        context.SaveChanges();
+    //                        dbContextTransaction.Commit();
+    //                    }
+    //                    catch (Exception)
+    //                    {
+    //                        dbContextTransaction.Rollback();
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //    catch (Exception)
+    //    {
+    //    }
+    //}
+    protected void kioskOrder_ActiveStepChanged(object sender, EventArgs e)
+    {
+        if (kioskOrder.ActiveStep.ID == "wsCCDetails")
+        {
+            txtCCReader.Focus();
+        }
+    }
+    //protected void CartList_RowCommand(object sender, GridViewCommandEventArgs e)
+    //{
+    //    if(e.CommandName == "Delete")
+    //    {
+    //        int index = Convert.ToInt32(e.CommandArgument);
+    //        GridViewRow row = CartList.Rows[index];
+
+    //        string orderDate = row.Cells[1].Text.ToString();
+    //        int serviceId = Convert.ToInt32(row.Cells[2].Text.ToString());
+
+
+
+    //        //using (shoppingCart userShoppingCart = new shoppingCart())
+    //        //{
+    //        //    userShoppingCart.RemoveFromCart(serviceId, orderDate);
+    //        //}
+    //    }
+    //}
+    protected void CartList_RowDeleted(object sender, GridViewDeletedEventArgs e)
+    {
+        e.ExceptionHandled = true;
+    }
+    protected void CartList_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        int index = e.RowIndex;
+        GridViewRow row = CartList.Rows[index];
+
+        string orderDate = row.Cells[1].Text.ToString();
+        int serviceId = Convert.ToInt32(row.Cells[2].Text.ToString());
+
+        using (shoppingCart userShoppingCart = new shoppingCart())
+        {
+            userShoppingCart.RemoveFromCart(serviceId, orderDate);
+        }
+
+    }
+    protected void btnUpdateCart_Click(object sender, EventArgs e)
+    {
+        UpdateCartItems();
+    }
+    public List<CartItems> UpdateCartItems()
+    {
+        using (shoppingCart userShoppingCart = new shoppingCart())
+        {
+            string cartId = userShoppingCart.GetCartId();
+            shoppingCart.ShoppingCartUpdates[] cartUpdates = new shoppingCart.ShoppingCartUpdates[CartList.Rows.Count];
+            for (int i = 0; i < CartList.Rows.Count; i++)
+            {
+                IOrderedDictionary rowValues = new OrderedDictionary();
+                rowValues = GetValues(CartList.Rows[i]);
+                cartUpdates[i].orderDate = Convert.ToString(rowValues["orderDate"]);
+                cartUpdates[i].Service_Id = Convert.ToInt32(rowValues["Service_ID"]);
+                TextBox qtyBox = (TextBox)CartList.Rows[i].Cells[4].FindControl("Quantity");
+                cartUpdates[i].Quantity = Convert.ToInt32(qtyBox.Text);
+                TextBox priceBox = (TextBox)CartList.Rows[i].Cells[5].FindControl("itemPrice");
+                cartUpdates[i].price = Convert.ToDecimal(priceBox.Text);
+                TextBox commentBox = (TextBox)CartList.Rows[i].Cells[6].FindControl("itemComment");
+                cartUpdates[i].comment = Convert.ToString(commentBox.Text);
+            }
+            userShoppingCart.UpdateShoppingCartDatabase(cartId, cartUpdates);
+            CartList.DataBind();
+            return userShoppingCart.GetCartItems();
+        }
+    }
+    public static IOrderedDictionary GetValues(GridViewRow row)
+    {
+        IOrderedDictionary values = new OrderedDictionary();
+        foreach (DataControlFieldCell cell in row.Cells)
+        {
+            if (cell.Visible)
+            {
+                cell.ContainingField.ExtractValuesFromCell(values, cell, row.RowState, true);
+            }
+        }
+        return values;
+    }
+    protected void txtCCReader_TextChanged(object sender, EventArgs e)
+    {
+        string string1;
+        try
+        {
+            string1 = txtCCReader.Text;
+
+            string[] ccparts;
+            ccparts = string1.Split('^');
+
+            string ccNumber = ccparts[0].Substring(2);
+            string ccName = ccparts[1].Trim();
+            string ccExpiration = ccparts[2].Substring(0, 4);
+
+            txtCCName.Text = ccName;
+            txtCCNumber.Text = ccNumber;
+            txtCCExpDate.Text = ccExpiration.Substring(2, 2) + ccExpiration.Substring(0, 2);
+            txtCCReader.Text = "";
+            txtCVV.Focus();
+            lblCCReader.Visible = true;
+        }
+        catch (Exception)
+        {
+            txtCCReader.Text = "";
+            txtCCReader.Focus();
+            txtCCName.Text = "";
+            txtCCNumber.Text = "";
+            txtCCExpDate.Text = "";
+
+            lblCCReader.Visible = true;
+            lblCCReader.Text = "Unable to read Credit Card";
+        }
+    }
+    protected void Quantity_TextChanged(object sender, EventArgs e)
+    {
+        UpdateCartItems();
+    }
+    protected void itemPrice_TextChanged(object sender, EventArgs e)
+    {
+        UpdateCartItems();
+    }
+    protected void itemComment_TextChanged(object sender, EventArgs e)
+    {
+        UpdateCartItems();
+    }
+}

@@ -1,0 +1,15 @@
+﻿<%@ Page Title="Quick Service" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="quickService.aspx.cs" Inherits="devotee_quickService" %>
+
+<%@ Register Src="../Controls/quickService.ascx" TagName="quickService" TagPrefix="uc1" %>
+<%@ Register Src="~/Controls/quickService.ascx" TagPrefix="uc2" TagName="quickService" %>
+
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <uc2:quickService runat="server" ID="quickService" />
+    <uc1:quickService ID="quickService1" runat="server" />
+</asp:Content>
+

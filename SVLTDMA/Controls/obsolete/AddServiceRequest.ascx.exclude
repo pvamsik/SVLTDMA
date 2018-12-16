@@ -1,0 +1,234 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" ViewStateMode="Enabled" EnableViewState="true" CodeFile="AddServiceRequest.ascx.cs" Inherits="Controls_AddServiceRequest" %>
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
+<asp:ScriptManagerProxy ID="ScriptManagerProxy1" runat="server"></asp:ScriptManagerProxy>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script>
+    $(function () {
+        var currentDate = new Date();
+        $(".datepicker").datepicker({
+            showOtherMonths: true,
+            selectOtherMonths: true
+        });
+        $(".datepicker").datepicker("setDate", currentDate);
+    });
+</script>
+
+
+<asp:ValidationSummary ID="ValidationSummary1" runat="server" HeaderText="Please fix the following errors:" />
+<p>
+    <asp:Label ID="lblErrorCC" runat="server" Visible="False" Text="For Credit Card, Card Type & Confirmation Number are required." />
+    <asp:Label ID="lblErrorCheck" runat="server" Visible="False" Text="For Checks, Check Number is required." />
+    <asp:Label ID="lblPrinterMsg" runat="server" Visible="False" />
+    <asp:Label ID="lblAuthorizationError" runat="server" Visible="False" />
+    <asp:Label ID="lblCCReader" runat="server" Visible="False" />
+</p>
+<br />
+<div class="reqfrmDetail">
+    <div class="reqfrmDetailBlock clear">
+
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="Label1" runat="server" Text="Service Date" SkinID="frmLabel" />
+            <asp:RequiredFieldValidator ID="RFV2" runat="server"
+                ControlToValidate="txtServiceDate" ErrorMessage="Select Service Date"
+                Display="Dynamic">*</asp:RequiredFieldValidator>
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:TextBox ID="txtServiceDate" runat="server" class="datepicker"></asp:TextBox>
+            <ajaxToolkit:CalendarExtender ID="txtServiceDate_CalendarExtender" runat="server" Enabled="True" TargetControlID="txtServiceDate">
+            </ajaxToolkit:CalendarExtender>
+        </div>
+    </div>
+
+    <div class="reqfrmDetailBlock clear">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblServiceLocation" runat="server" Text="Service Location" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:DropDownList ID="ddlServiceLocation" runat="server"
+                AutoPostBack="true" DataTextField="Service_type_description" DataValueField="Service_Type_ID"
+                OnSelectedIndexChanged="ddlServiceLocation_SelectedIndexChanged">
+            </asp:DropDownList>
+        </div>
+    </div>
+
+    <div class="reqfrmDetailBlock clear">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblServiceName" runat="server" Text="Service" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <span class="span-service">
+                <input id="hdnServiceFee" type="hidden" runat="server" class="hdn-service-fee" />
+                <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                    <ContentTemplate>
+                        <asp:DropDownList ID="ddlService" runat="server" AutoPostBack="true"
+                            DataTextField="Service_Name" DataValueField="Service_ID"
+                            OnSelectedIndexChanged="ddlService_SelectedIndexChanged">
+                        </asp:DropDownList>
+                    </ContentTemplate>
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="ddlServiceLocation" EventName="SelectedIndexChanged" />
+                    </Triggers>
+                </asp:UpdatePanel>
+            </span>
+            <input id="hdnServiceId" type="hidden" runat="server" value="0" class="hdn-service-id" />
+        </div>
+    </div>
+    <div class="reqfrmDetailBlock clear">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblServiceFee" runat="server" Text="Service Fee" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:UpdatePanel ID="UpdatePanel2" runat="server">
+                <ContentTemplate>
+                    <asp:TextBox ID="txtPaidFee" runat="server" Class="txtPaidFee"></asp:TextBox>
+                </ContentTemplate>
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="ddlService" EventName="SelectedIndexChanged" />
+                </Triggers>
+            </asp:UpdatePanel>
+            <asp:RequiredFieldValidator ID="RFV1" runat="server"
+                ErrorMessage="Fee Paid required" ControlToValidate="txtPaidFee" Display="Dynamic">*</asp:RequiredFieldValidator>
+        </div>
+    </div>
+    <div class="reqfrmDetailBlock clear">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblPaymentType" runat="server" Text="Payment Type" SkinID="frmLabel" />
+            <asp:RequiredFieldValidator ID="RFV3" runat="server"
+                ControlToValidate="rdlPaymentType" ErrorMessage="Select Payment Type"
+                Display="Dynamic">*</asp:RequiredFieldValidator>
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:RadioButtonList ID="rdlPaymentType" runat="server" class="rdl-payment-type"
+                DataTextField="Payment_type_description"
+                DataValueField="Payment_type_ID" RepeatDirection="Horizontal">
+            </asp:RadioButtonList>
+        </div>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-check">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblCheckNumber" runat="server" Text="Check Number" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:TextBox ID="txtCheckNumber" runat="server" class="tr-check"></asp:TextBox>
+        </div>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblCCType" runat="server" Text="Credit Card Type" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:RadioButtonList ID="rdlCCType" runat="server"
+                DataTextField="Credit_card_type_description"
+                DataValueField="Credit_card_type_id" RepeatDirection="Horizontal" AutoPostBack="False" DataSourceID="SDS_CardType">
+            </asp:RadioButtonList>
+        </div>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        <p>&nbsp;</p>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        Option 1: Swipe Credit Card below in Swipe Credit Card field to populate the Case Information in Option 2<br />
+        <p>
+            <asp:Label ID="lblmdl" runat="server" Text="Swipe Credit Card:" SkinID="frmLabel" />
+            <asp:TextBox ID="txtCCSwipe" runat="server" OnTextChanged="txtCCSwipe_TextChanged" AutoPostBack="true" />
+        </p>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        or<br />
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        Option 2: Manually Enter the Card Information<br />
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblCardHolderName" runat="server" Text="Card Holder Name" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:TextBox ID="txtCardHolderName" runat="server"></asp:TextBox>
+        </div>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblCardNumber" runat="server" Text="Card Number" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:TextBox ID="txtCardNumber" runat="server"></asp:TextBox>
+        </div>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblCardExpDate" runat="server" Text="Card Exp Date" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:DropDownList ID="ddlCCExpMonth" runat="server">
+                <asp:ListItem Value="01">January</asp:ListItem>
+                <asp:ListItem Value="02">February</asp:ListItem>
+                <asp:ListItem Value="03">March</asp:ListItem>
+                <asp:ListItem Value="04">April</asp:ListItem>
+                <asp:ListItem Value="05">May</asp:ListItem>
+                <asp:ListItem Value="06">June</asp:ListItem>
+                <asp:ListItem Value="07">July</asp:ListItem>
+                <asp:ListItem Value="08">August</asp:ListItem>
+                <asp:ListItem Value="09">September</asp:ListItem>
+                <asp:ListItem Value="10">October</asp:ListItem>
+                <asp:ListItem Value="11">November</asp:ListItem>
+                <asp:ListItem Value="12">December</asp:ListItem>
+            </asp:DropDownList>
+            <asp:DropDownList ID="ddlCCExpYear" runat="server">
+                <asp:ListItem Value="14">2014</asp:ListItem>
+                <asp:ListItem Value="15">2015</asp:ListItem>
+                <asp:ListItem Value="16">2016</asp:ListItem>
+                <asp:ListItem Value="17">2017</asp:ListItem>
+                <asp:ListItem Value="18">2018</asp:ListItem>
+                <asp:ListItem Value="19">2019</asp:ListItem>
+                <asp:ListItem Value="20">2020</asp:ListItem>
+                <asp:ListItem Value="21">2021</asp:ListItem>
+                <asp:ListItem Value="22">2022</asp:ListItem>
+                <asp:ListItem Value="23">2023</asp:ListItem>
+            </asp:DropDownList>
+            <asp:TextBox ID="txtCardExpDate" runat="server" Visible="false"></asp:TextBox>
+        </div>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        <p>&nbsp;</p>
+    </div>
+    <div class="reqfrmDetailBlock clear tr-credit">
+        <div class="reqfrmDetailLeft">
+            <asp:Label ID="lblCVVNumber" runat="server" Text="Card CVV Number" SkinID="frmLabel" />
+        </div>
+        <div class="reqfrmDetailRight">
+            <asp:TextBox ID="txtCardCVVNumber" runat="server"></asp:TextBox>
+        </div>
+    </div>
+</div>
+<br />
+<table id="Table1">
+    <tr>
+        <td>
+            <asp:Button ID="cmdAddService" runat="server" Text="Add Service" class="btn-submit" OnClick="cmdAddService_Click" CssClass="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" /></td>
+    </tr>
+</table>
+<asp:SqlDataSource ID="SDS_Location" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" SelectCommand="SELECT [Service_Type_ID], [Service_type], [Service_type_description] FROM [Service_Type]"></asp:SqlDataSource>
+<asp:SqlDataSource ID="SDS_Services" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" SelectCommand="SELECT [Service_ID], [Service_Name], [Service_Description], [Service_Fee], [Service_Type_ID] FROM [Service] WHERE (([Service_Status] = @Service_Status) AND ([Service_Type_ID] = @Service_Type_ID)) ORDER BY [Service_Name]">
+    <SelectParameters>
+        <asp:Parameter DefaultValue="true" Name="Service_Status" Type="Boolean" />
+        <asp:ControlParameter ControlID="ddlServiceLocation" Name="Service_Type_ID" PropertyName="SelectedValue" Type="Int32" />
+    </SelectParameters>
+</asp:SqlDataSource>
+<asp:SqlDataSource ID="SDS_PaymentType" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" SelectCommand="SELECT [Payment_type_ID], [Payment_type_code], [Payment_type_description] FROM [Payment_Type]"></asp:SqlDataSource>
+<asp:SqlDataSource ID="SDS_CardType" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" SelectCommand="SELECT [Credit_card_type_id], [Credit_card_type_description] FROM [Credit_Card_Type]"></asp:SqlDataSource>
+
+
+<asp:SqlDataSource ID="SDS_ServiceFee" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" SelectCommand="SELECT [Service_Fee] FROM [Service] WHERE ([Service_ID] = @Service_ID)">
+    <SelectParameters>
+        <asp:ControlParameter ControlID="ddlService" Name="Service_ID" PropertyName="SelectedValue" Type="Int32" />
+    </SelectParameters>
+</asp:SqlDataSource>
+<%--<asp:SqlDataSource ID="SDS_DevoteeInfo" runat="server" ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" SelectCommand="SELECT Devotee.Devotee_ID, Devotee.Devotee_First_Name, Devotee.Devotee_Last_Name, Devotee.Devotee_M_Name, Devotee_Contact_Info.Devotee_Phone1, Devotee_Contact_Info.Devotee_Phone2, Devotee_Contact_Info.Devotee_Email1, Devotee_Mail_Address.Devotee_Address1, Devotee_Mail_Address.Devotee_Address2, Devotee_Mail_Address.Devotee_City, Devotee_Mail_Address.Devotee_State_CD, Devotee_Mail_Address.Devotee_Zip_CD FROM Devotee INNER JOIN Devotee_Mail_Address ON Devotee.Devotee_ID = Devotee_Mail_Address.Devotee_ID INNER JOIN Devotee_Contact_Info ON Devotee.Devotee_ID = Devotee_Contact_Info.Devotee_ID WHERE (Devotee.Devotee_ID = @devoteeID)">
+    <SelectParameters>
+        <asp:QueryStringParameter Name="devoteeID" QueryStringField="devoteeID" />
+    </SelectParameters>
+</asp:SqlDataSource>--%>
+
+
+
+
